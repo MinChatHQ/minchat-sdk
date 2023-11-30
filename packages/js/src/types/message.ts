@@ -1,0 +1,17 @@
+type File = {
+    type: "gif" | "video" | "image" | "file"
+    url: string
+    name?: string
+    size?: string
+}
+
+export type Message = {
+    id?: string
+    text?: string
+    file?: File
+    createdAt?: string
+    // tracks whether the message has been seen or not
+    seen?: boolean
+    metadata?: Record<string, string | number>
+    chatId?: string
+}

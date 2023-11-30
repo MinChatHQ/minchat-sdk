@@ -1,0 +1,19 @@
+.container {
+    width: 100%;
+    height: 100vh;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr))
+}
+
+.sq {
+    padding: 12px;
+    height: 400px;
+    background-color: yellow;
+}
+
+.innersq {
+    border: 3px solid black;
+    width: 100%;
+    height: 100%;
+    padding: 4px;
+}

@@ -1,0 +1,63 @@
+{
+  "version": "2.8.0",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=10"
+  },
+  "scripts": {
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "test": "tsdx test",
+    "lint": "tsdx lint",
+    "prepare": "tsdx build",
+    "size": "size-limit",
+    "analyze": "size-limit --why"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "tsdx lint"
+    }
+  },
+  "prettier": {
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
+  "name": "@minchat/reactnative",
+  "author": "MinChat",
+  "module": "dist/react-native.esm.js",
+  "size-limit": [
+    {
+      "path": "dist/react-native.cjs.production.min.js",
+      "limit": "10 KB"
+    },
+    {
+      "path": "dist/react-native.esm.js",
+      "limit": "10 KB"
+    }
+  ],
+  "devDependencies": {
+    "@size-limit/preset-small-lib": "^8.1.0",
+    "@types/react": "^18.0.26",
+    "expo-device": "^5.0.0",
+    "expo-notifications": "^0.17.0",
+    "husky": "^8.0.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-native": "^0.71.2",
+    "size-limit": "^8.1.0",
+    "tsdx": "^0.14.1",
+    "tslib": "^2.4.1",
+    "typescript": "^4.8.4"
+  },
+  "dependencies": {
+    "@minchat/react": "^2.6.0"
+  }
+}
