@@ -1,12 +1,11 @@
 import Chat from "./chat"
 import Config from "./configs/config"
-import { transformChatsResponse, transformUser } from "./transformers";
+import { transformChat, transformChatsResponse, transformUser } from "./transformers";
 import { ChatsResponse } from "./types/chats-response";
 import { GroupChatProps } from "./types/group-chat-props";
 import { UpdateUserProps } from "./types/update-user-props";
 import { User } from "./types/user"
 import { UserProps } from "./types/user-props";
-import { processChatItem } from "./utils/chat-utils";
 import { prepareFileForUpload } from "./utils/file-utils";
 import getAxios from "./utils/get-axios";
 import { io, ManagerOptions, SocketOptions } from "socket.io-client"
@@ -45,26 +44,11 @@ export class MinChatInstance {
                     params
                 })
 
-                const chats: Chat[] = []
-
-
-                const localConfig = this.config
-
-
-                await Promise.all(
-                    response.data.chats.map(async (chatItem: any) => {
-                        const chat = await processChatItem(chatItem, localConfig)
-                        chats.push(chat)
-                    })
-                )
-
-                response.data.chats = chats
-
                 //pass the data into the callback
                 callback && callback(response.data)
 
                 //return the data in the function if using async await
-                return transformChatsResponse(response.data)
+                return transformChatsResponse(response.data, this.config)
 
             } catch (e) {
                 console.log(e)
@@ -86,7 +70,7 @@ export class MinChatInstance {
     onChat(listener: (chat: Chat) => void) {
         this.config.socket?.on('chat', async (data) => {
             if (data.success) {
-                const chat = await processChatItem(data, this.config)
+                const chat = await transformChat(data, this.config)
                 listener && listener(chat)
             }
         });

@@ -6,4 +6,4 @@ export type ChatsResponse = {
     page: number,
     totalChats: number,
     totalPages: number
- }
+}

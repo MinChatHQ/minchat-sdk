@@ -6,7 +6,7 @@ import styled from 'styled-components'
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import './index.css'
 
-const devKey = "CLNH7VICS00007RUHG0AD44UN"
+const devKey = "CLQAJZ09B00007STC893B3TCL"
 const prodKey = ""
 
 
@@ -131,11 +131,11 @@ const App = () => {
               // demo={true}
               test={true}
               // groupChatTitle='Groupies'
-              // startConversation={async (minchat) => {
-              //   const user = await minchat.createUser(user2)
+              startConversation={async (minchat) => {
+                const user = await minchat.createUser(user2)
 
-              //   return user.username
-              // }}
+                return user.username
+              }}
               user={user1}
               apiKey={apiKey}
               renderIsTyping={({ user }) => <div>{user.name} is typing</div>}

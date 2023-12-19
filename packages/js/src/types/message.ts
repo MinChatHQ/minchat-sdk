@@ -9,9 +9,8 @@ export type Message = {
     id?: string
     text?: string
     file?: File
-    createdAt?: string
+    createdAt?: Date
     // tracks whether the message has been seen or not
     seen?: boolean
     metadata?: Record<string, string | number>
-    chatId?: string
 }

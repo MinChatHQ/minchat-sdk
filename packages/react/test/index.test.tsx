@@ -185,6 +185,55 @@ describe("MinChat Instance", () => {
 
     // })
 
+    it("should not add chat to chats array if a message hasnt been sent", async () => {
+
+        /**
+         * 
+         */
+        const MockComponent = () => {
+            const [complete, setComplete] = useState(false)
+
+            const minchat = useMinChat()
+            const { chats } = useChats()
+
+            useEffect(() => {
+                expect(chats?.length).toBeFalsy()
+            }, [chats])
+
+
+            useEffect(() => {
+                if (minchat) {
+                    const setupChat = async () => {
+                        // test for a new chat to appear on the chats list after you send the first message
+                        const createdUser3 = await minchat.createUser({ username: 'minchat-no-chats-inbox1', name: "NO CHats User" })
+
+                        await minchat.chat(createdUser3.username)
+                        //wait 6 seconds to see if chats list updates
+                        setTimeout(() => setComplete(true), 6_000)
+                    }
+
+                    setupChat()
+                }
+            }, [minchat])
+
+            return <div>{complete && "complete"}</div>;
+
+        };
+        render(
+            <MinChatProvider
+                test
+                apiKey={apiKey}
+                user={{ username: "no-chat-leak1", name: "No Chat Leak" }}>
+                <MockComponent />
+            </MinChatProvider>
+        );
+
+
+        await waitFor(() => {
+            expect(screen.getByText('complete')).toBeInTheDocument();
+        }, { timeout: 15_000 });
+    }, 20_000)
+
 
 
     it("should get demo chats and messages", async () => {
@@ -199,6 +248,9 @@ describe("MinChat Instance", () => {
             useEffect(() => {
                 if (chats && chats?.length > 0) {
                     expect(chats.length).toBeGreaterThanOrEqual(1)
+                    for (const chat of chats) {
+                        expect(chat.getLastMessage()?.createdAt).toBeDefined()
+                    }
                     setActiveChat(chats[0])
                 }
             }, [chats])
@@ -227,6 +279,9 @@ describe("MinChat Instance", () => {
                                 break;
                             case 7:
                                 expect(messages.length).toEqual(7)
+                                for (const message of messages) {
+                                    expect(message?.createdAt).toBeDefined()
+                                }
                                 sendMessage({ text: messageText })
                                 break;
                             case 8:
@@ -236,6 +291,10 @@ describe("MinChat Instance", () => {
                                         resolve(null)
                                     }, 4000)
                                 })
+
+                                for (const message of messages) {
+                                    expect(message?.createdAt).toBeDefined()
+                                }
 
                                 expect(messages[7].text).toEqual(messageText)
                                 expect(messages[6].text).not.toEqual(messageText)
@@ -360,7 +419,7 @@ describe("MinChat Instance", () => {
             useEffect(() => {
                 const verify = async () => {
                     // console.log(chats?.map(chat => ({ text: chat.getLastMessage()?.text, id: chat.getId() })))
- 
+
                     //verify that the chats dont all have the same last message which would indicate an error
                     if (chats?.length === 3) {
                         // wait 10 seconds for any additional messages to get
@@ -374,6 +433,10 @@ describe("MinChat Instance", () => {
                         expect(chats[0].getLastMessage()?.text).not.toEqual(chats[1].getLastMessage()?.text)
                         expect(chats[1].getLastMessage()?.text).not.toEqual(chats[2].getLastMessage()?.text)
                         expect(chats[0].getLastMessage()?.text).not.toEqual(chats[2].getLastMessage()?.text)
+
+                        for (const chat of chats) {
+                            expect(chat.getLastMessage()?.createdAt).toBeDefined()
+                        }
                         setComplete(true)
 
                     }
@@ -437,6 +500,7 @@ describe("MinChat Instance", () => {
             }, [thirdChat])
 
 
+
             let instantiateOnce = false
 
             useEffect(() => {
@@ -444,6 +508,15 @@ describe("MinChat Instance", () => {
                     instantiateOnce = true
                     expect(chats[0].getId()).toEqual(thirdChat?.getId())
                     expect(chats[0].getTitle()).toEqual(thirdChat?.getTitle())
+
+                    for (const chat of chats) {
+           
+                        const lastMessage = chat.getLastMessage()
+
+                        if (lastMessage) {
+                            expect(chat.getLastMessage()?.createdAt).toBeDefined()
+                        }
+                    }
 
                     const setupChat = async () => {
                         if (minchat) {
@@ -505,13 +578,18 @@ describe("MinChat Instance", () => {
                                 expect(messages[0].text).toEqual("Hello")
                                 expect(messages[0].user.name).toEqual(user1.name)
                                 expect(messages[0].user.username).toEqual(user1.username)
+                                for (const message of messages) {
+                                    expect(message?.createdAt).toBeDefined()
+                                }
                                 break
                             case 2:
                                 // second message that is received
                                 expect(messages[1].text).toEqual("Received")
                                 expect(messages[1].user.name).toEqual(user2.name)
                                 expect(messages[1].user.username).toEqual(user2.username)
-
+                                for (const message of messages) {
+                                    expect(message?.createdAt).toBeDefined()
+                                }
                                 //wait 4 seconds
                                 await new Promise((resolve) => {
                                     setTimeout(() => {

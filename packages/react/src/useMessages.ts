@@ -30,12 +30,12 @@ const useMessages = (chat?: Chat, reverse?: boolean) => {
 
 
     useEffect(() => {
-        //find the exact channel in the chats array and update its information because the messages have beeing successfully retrieved
+        //find the exact channel in the chats array and update its information because the messages have been successfully retrieved
         //which means the chat objects channel Id has be updated and can be found in the chats array
         if (chats && messages && chat) {
+            //
             setChats((currentChats) => {
                 if (!currentChats) return []
-
                 return currentChats.map(chatItem => {
                     if (chatItem.getId() === chat.getId()) {
                         //determine whether to set the group name to the chats object chat or to the local chat object
@@ -48,6 +48,13 @@ const useMessages = (chat?: Chat, reverse?: boolean) => {
                     return chatItem
                 })
             })
+
+            //update the seen for all the messages that are not seen
+            for (const message of messages) {
+                if (!message.seen) {
+                    chat.jsChat.setSeen(message.id)
+                }
+            }
         }
     }, [messages])
 
@@ -195,7 +202,8 @@ const useMessages = (chat?: Chat, reverse?: boolean) => {
         if (chat) {
             setOnChatNewChat && setOnChatNewChat(chat)
 
-            const dateCreated = new Date().toISOString()
+            const dateObj = new Date()
+            const dateCreated = dateObj.toISOString()
             const meta = message.metadata ? message.metadata : {}
             meta.minchatMessageIdentifier = dateCreated
 
@@ -204,7 +212,7 @@ const useMessages = (chat?: Chat, reverse?: boolean) => {
                     text: message.text,
                     user: user,
                     loading: true,
-                    createdAt: dateCreated,
+                    createdAt: dateObj,
                     id: dateCreated,
                     metadata: {
                         ...meta,

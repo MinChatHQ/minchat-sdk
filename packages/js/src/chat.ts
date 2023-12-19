@@ -52,20 +52,22 @@ class Chat {
     }
 
     /**
-     * notify the chat that the last message has been seen
+     * notify the chat that a message has been seen. if the messageId is not defined then it will notify the chat that the lastMessage has been seen
      */
-    setSeen() {
+    setSeen(messageId?: string | null) {
         this.mainConfig?.socket?.emit('message.seen', {
-            lastMessageId: this.config.lastMessage?.id,
+            lastMessageId: messageId || this.config.lastMessage?.id,
             user: this.mainConfig.user,
             apiKey: this.mainConfig.apiKey,
         })
 
         //set the seen for the last message that is in local to true
-        if (this.config.lastMessage) {
+        if (messageId && this.config.lastMessage) {
             this.config.lastMessage.seen = true
         }
     }
+
+
 
     /**
      * 
@@ -132,10 +134,10 @@ class Chat {
         await this.mainConfig.waitForInstanceReady()
 
         if (this.mainConfig.user) {
-            let dateCreated = new Date().toISOString()
+            let dateCreated = new Date()
 
             const meta = sendMessageData.metadata ? sendMessageData.metadata : {}
-            meta.minchatJSIdentifier = dateCreated
+            meta.minchatJSIdentifier = dateCreated.toISOString()
 
             //update the last message of this chat item //update it still even if the message fails to send
             this.config.lastMessage = {

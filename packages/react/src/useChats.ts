@@ -117,6 +117,7 @@ const useChats = () => {
             setError(undefined)
             const jsChatsList = await minChat.instance.getChats(paginationCount)
 
+
             setPaginationCount(count => count + 1)
 
             if (!pagesInserted.includes(jsChatsList.page)) {

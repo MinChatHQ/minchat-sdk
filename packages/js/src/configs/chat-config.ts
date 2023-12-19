@@ -13,6 +13,8 @@ class ChatConfig {
 
     //** the channel avatar */
     avatar?: string
+
+    createdAt?: Date
 }
 
 export default ChatConfig

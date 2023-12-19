@@ -1,4 +1,4 @@
-import MinChat, {  } from '..';
+import MinChat, { } from '..';
 import { LOCALHOST_PATH } from '../configs/config';
 import { UserProps } from '../types/user-props';
 import getAxios from '../utils/get-axios';
@@ -20,6 +20,37 @@ describe("MinChat Instance", () => {
         await getAxios().post(LOCALHOST_PATH + "/sdk-test", {
             user_id: userId
         })
+    })
+
+
+    it('should get chats', (done) => {
+
+        const runTest = async () => {
+            const user1 = { username: "yes-chats", name: "User1" }
+
+            const instance1 = await prepareInstance(user1)
+            const user2 = await instance1.createUser({ username: "user2", name: "User2" })
+            const chat = await instance1.chat(user2.username)
+            chat?.sendMessage({ text: "Hey" }, async () => {
+                const chatsResponse = await instance1.getChats()
+                expect(chatsResponse.chats.length).toEqual(1)
+                done()
+            })
+        }
+
+        runTest()
+    })
+
+
+    it('should not get chats that dont have a lastSent message', async () => {
+        const user1 = { username: "no-chats", name: "User1" }
+
+        const instance1 = await prepareInstance(user1)
+        const user2 = await instance1.createUser({ username: "user2", name: "User2" })
+        await instance1.chat(user2.username)
+
+        const chatsResponse = await instance1.getChats()
+        expect(chatsResponse.chats.length).toBeFalsy()
     })
 
 
@@ -56,12 +87,15 @@ describe("MinChat Instance", () => {
                     expect(chat.getLastMessage()?.text).toEqual("Hi")
                     expect(chat.getLastMessage()?.user.id).toEqual(instance2.config.user?.id)
                     expect(chat.getLastMessage()?.user.username).toEqual(instance2.config.user?.username)
+                    expect(chat.getLastMessage()?.createdAt).toBeDefined()
+
                 } else if (user1MessageCount === 1) {
                     user1MessageCount++
 
                     expect(chat.getLastMessage()?.text).toEqual("Hey")
                     expect(chat.getLastMessage()?.user.id).toEqual(instance3.config.user?.id)
                     expect(chat.getLastMessage()?.user.username).toEqual(instance3.config.user?.username)
+                    expect(chat.getLastMessage()?.createdAt).toBeDefined()
 
                     const messagesResponse = await chat.getMessages()
 
@@ -74,6 +108,8 @@ describe("MinChat Instance", () => {
 
                     for (let i = 0; i < messages.length; i++) {
                         expect(messagesResponse.messages[i].text).toEqual(messages[i])
+                        expect(messagesResponse.messages[i].createdAt).toBeDefined()
+
                     }
 
                     lastMessageRecievedByCount++
@@ -90,6 +126,7 @@ describe("MinChat Instance", () => {
                     expect(chat.getLastMessage()?.text).toEqual("Hello")
                     expect(chat.getLastMessage()?.user.id).toEqual(instance1.config.user?.id)
                     expect(chat.getLastMessage()?.user.username).toEqual(instance1.config.user?.username)
+                    expect(chat.getLastMessage()?.createdAt).toBeDefined()
 
                     // user 2 send a message back to the group
                     chat.sendMessage({ text: "Hi" })
@@ -100,6 +137,7 @@ describe("MinChat Instance", () => {
                     expect(chat.getLastMessage()?.text).toEqual("Hey")
                     expect(chat.getLastMessage()?.user.id).toEqual(instance3.config.user?.id)
                     expect(chat.getLastMessage()?.user.username).toEqual(instance3.config.user?.username)
+                    expect(chat.getLastMessage()?.createdAt).toBeDefined()
 
                     lastMessageRecievedByCount++
                     if (lastMessageRecievedByCount === 2) done()
@@ -116,12 +154,15 @@ describe("MinChat Instance", () => {
                     expect(chat.getLastMessage()?.text).toEqual("Hello")
                     expect(chat.getLastMessage()?.user.id).toEqual(instance1.config.user?.id)
                     expect(chat.getLastMessage()?.user.username).toEqual(instance1.config.user?.username)
+                    expect(chat.getLastMessage()?.createdAt).toBeDefined()
+
                 } else if (user3MessageCount === 1) {
                     user3MessageCount++
 
                     expect(chat.getLastMessage()?.text).toEqual("Hi")
                     expect(chat.getLastMessage()?.user.id).toEqual(instance2.config.user?.id)
                     expect(chat.getLastMessage()?.user.username).toEqual(instance2.config.user?.username)
+                    expect(chat.getLastMessage()?.createdAt).toBeDefined()
 
                     // user 3 send a message back to the group
                     chat.sendMessage({ text: "Hey" })
@@ -231,11 +272,23 @@ describe("MinChat Instance", () => {
         expect(chatsResponse.chats.length).toBeGreaterThanOrEqual(1)
         expect(chatsResponse.totalChats).toBeGreaterThanOrEqual(1)
 
+        for (const chat of chatsResponse.chats) {
+            expect(chat.getLastMessage()?.createdAt).toBeDefined()
+            // verify that createdAt is Date object
+            expect(chat.getLastMessage()?.createdAt instanceof Date).toEqual(true)
+        }
+
         const messagesResponse = await chatsResponse.chats[0].getMessages()
 
         expect(messagesResponse?.success).toEqual(true)
         expect(messagesResponse?.messages.length).toBeGreaterThanOrEqual(1)
         expect(messagesResponse?.totalMessages).toBeGreaterThanOrEqual(1)
+
+        for (const message of messagesResponse?.messages) {
+            expect(message.createdAt).toBeDefined()
+            expect(message.createdAt instanceof Date).toEqual(true)
+
+        }
     })
 
 
@@ -254,6 +307,14 @@ describe("MinChat Instance", () => {
             chat1?.sendMessage({ text: "Hello" }, async () => {
 
                 const { chats } = await instance2.getChats()
+
+                for (const chat of chats) {
+                    expect(chat.getLastMessage()?.createdAt).toBeDefined()
+                    expect(chat.getLastMessage()?.createdAt instanceof Date).toEqual(true)
+
+                }
+
+
                 const chat2 = chats[0]
 
                 expect(chat2?.getTitle()).toEqual(user1.name)
@@ -376,6 +437,8 @@ describe("MinChat Instance", () => {
                 expect(chat.getLastMessage()?.text).toEqual("Hello")
                 expect(chat.getLastMessage()?.user.id).toEqual(instance1.config.user?.id)
                 expect(chat.getLastMessage()?.user.username).toEqual(instance1.config.user?.username)
+                expect(chat.getLastMessage()?.createdAt).toBeDefined()
+                expect(chat.getLastMessage()?.createdAt instanceof Date).toEqual(true)
 
                 // send a message back
                 chat.sendMessage({
@@ -399,6 +462,8 @@ describe("MinChat Instance", () => {
                 expect(chat.getLastMessage()?.metadata?.test).toEqual("test-meta-2")
                 expect(chat.getLastMessage()?.user.id).toEqual(instance2.config.user?.id)
                 expect(chat.getLastMessage()?.user.username).toEqual(instance2.config.user?.username)
+                expect(chat.getLastMessage()?.createdAt).toBeDefined()
+                expect(chat.getLastMessage()?.createdAt instanceof Date).toEqual(true)
 
                 // verify that all the messages are present that have been sent and recieved
                 const messages = await chat.getMessages()
@@ -408,6 +473,13 @@ describe("MinChat Instance", () => {
                 expect(messages.messages[1].text).toEqual("Received")
                 expect(messages.messages[0].metadata?.test).toEqual("test-meta")
                 expect(messages.messages[1].metadata?.test).toEqual("test-meta-2")
+
+                for (const message of messages.messages) {
+                    expect(message.createdAt).toBeDefined()
+                    expect(message?.createdAt instanceof Date).toEqual(true)
+
+                }
+
                 completeLastActionCount()
             })
 
@@ -419,6 +491,7 @@ describe("MinChat Instance", () => {
                 expect(message.text).toEqual("Received")
                 expect(message.metadata?.test).toEqual("test-meta-2")
                 expect(message.createdAt).toBeDefined()
+                expect(message?.createdAt instanceof Date).toEqual(true)
                 expect(message.user.id).toEqual(instance2.config.user?.id)
                 expect(message.user.username).toEqual(instance2.config.user?.username)
 
@@ -433,6 +506,7 @@ describe("MinChat Instance", () => {
             }, (message) => {
                 expect(message.text).toEqual("Hello")
                 expect(message.createdAt).toBeDefined()
+                expect(message?.createdAt instanceof Date).toEqual(true)
                 expect(message.user.id).toEqual(instance1.config.user?.id)
                 expect(message.user.username).toEqual(instance1.config.user?.username)
                 expect(message.metadata?.test).toEqual("test-meta")

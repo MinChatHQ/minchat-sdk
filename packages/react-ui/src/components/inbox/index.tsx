@@ -70,7 +70,11 @@ export default function Inbox({
       }
 
       if (lastMessage) {
-        returnVal.lastMessage = { ...lastMessage, media: lastMessage.file }
+        returnVal.lastMessage = {
+          ...lastMessage,
+          createdAt: lastMessage.createdAt,
+          media: lastMessage.file
+        }
       }
       return returnVal
     })}
@@ -87,14 +91,20 @@ export default function Inbox({
     currentUserId={connectedUser.id}
     customEmptyMessagesComponent={(() => renderEmptyMessages({ isMobile }))()}
     customLoaderComponent={(() => renderLoader({ isMobile }))()}
-    messages={messages && messages.map((message) => {
+    messages={messages && messages.map((ogMessage) => {
+      const { createdAt, ...message } = ogMessage
+
       if (message.file) {
         return {
           ...message,
-          media: message.file
+          createdAt,
+          media: message.file,
         }
       } else {
-        return message
+        return {
+          ...message,
+          createdAt,
+        }
       }
     })}
     onScrollToTop={() => paginate()}
@@ -146,8 +156,10 @@ export default function Inbox({
         }
 
         if (usernames.length === 1 && !groupChatTitle) {
+          console.log("normal chat")
           chat = await minchat.chat((usernames)[0])
         } else {
+          console.log("group chat")
           //it is a group chat with multiple people
           chat = await minchat.groupChat({ title: groupChatTitle, memberUsernames: usernames })
         }
@@ -219,12 +231,12 @@ export default function Inbox({
   /**
    * 
    */
-  const ChatListHeader = () => renderChatListHeader({ isMobile: determineIsMobile() })
+  const ChatListHeaderComponent = () => renderChatListHeader({ isMobile: determineIsMobile() })
 
   /**
  * 
  */
-  const ChatList = () => currentUser && renderChatList({
+  const ChatListComponent = () => currentUser && renderChatList({
     connectedUser: currentUser,
     chats,
     loading: chatsLoading,
@@ -237,7 +249,7 @@ export default function Inbox({
   /**
  * 
  */
-  const MessageListHeader = () => renderMessageListHeader({
+  const MessageListHeaderComponent = () => renderMessageListHeader({
     heading: (selectedChat && selectedChat.getTitle()) || "",
     clearMessageList: () => setSelectedChat(undefined),
     isMobile: determineIsMobile()
@@ -246,7 +258,7 @@ export default function Inbox({
   /**
  * 
  */
-  const MessageList = () => currentUser && renderMessageList({
+  const MessageListComponent = () => currentUser && renderMessageList({
     paginate: throttledMessagesPaginate,
     messages,
     loading: messagesLoading,
@@ -259,7 +271,7 @@ export default function Inbox({
   /**
  * 
  */
-  const Input = () => renderInput({
+  const InputComponent = () => renderInput({
     sendMessage: (text) => handleSendMessage({ text }),
     sendFile: () => openFileSelector(),
     inputProps: { onKeyDown, onKeyUp },
@@ -293,14 +305,14 @@ export default function Inbox({
         {determineIsMobile() ? (
           selectedChat ?
             <MessageContainer>
-              {MessageListHeader()}
-              {MessageList()}
-              {Input()}
+              {MessageListHeaderComponent()}
+              {MessageListComponent()}
+              {InputComponent()}
             </MessageContainer>
             :
             <div style={{ position: "relative", width: "100%" }}>
-              {ChatListHeader()}
-              {ChatList()}
+              {ChatListHeaderComponent()}
+              {ChatListComponent()}
             </div>
         )
           :
@@ -308,16 +320,16 @@ export default function Inbox({
           /* desktop view */
           <>
             <Sidebar>
-              {ChatListHeader()}
-              {ChatList()}
+              {ChatListHeaderComponent()}
+              {ChatListComponent()}
             </Sidebar>
 
             <MessageContainer>
               {selectedChat ?
                 <>
-                  {MessageListHeader()}
-                  {MessageList()}
-                  {Input()}
+                  {MessageListHeaderComponent()}
+                  {MessageListComponent()}
+                  {InputComponent()}
                 </>
                 :
                 <MessageListBackground

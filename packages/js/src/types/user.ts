@@ -3,7 +3,7 @@ export type User = {
     username: string
     name: string
     avatar?: string
-    createdAt: string
+    createdAt: Date
     metadata?: Record<string, string | number>
 }
 
