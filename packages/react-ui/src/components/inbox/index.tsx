@@ -156,10 +156,8 @@ export default function Inbox({
         }
 
         if (usernames.length === 1 && !groupChatTitle) {
-          console.log("normal chat")
           chat = await minchat.chat((usernames)[0])
         } else {
-          console.log("group chat")
           //it is a group chat with multiple people
           chat = await minchat.groupChat({ title: groupChatTitle, memberUsernames: usernames })
         }
