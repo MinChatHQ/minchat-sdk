@@ -365,6 +365,49 @@ describe("MinChat Instance", () => {
     })
 
 
+
+    it("should set seen and listen for message seen", (done) => {
+        async function runTest() {
+            const user1 = { username: "user1-seen", name: "User1" }
+            const user2 = { username: "user2-seen", name: "User2" }
+
+            const instance1 = await prepareInstance(user1)
+            const instance2 = await prepareInstance(user2)
+
+            let sentMessageId: string | undefined = ""
+
+            const chat1 = await instance1.chat(instance2.config.user?.username || "")
+
+            chat1?.sendMessage({ text: "Hello" }, async () => {
+
+                const { chats } = await instance2.getChats()
+
+                const chat2 = chats[0]
+
+
+                chat2?.onMessageSeen((messageId) => {
+                    expect(messageId).toBe(sentMessageId)
+                    done()
+                })
+
+
+                chat2.sendMessage({ text: "Hey" }, async (data) => {
+                    sentMessageId = data.id
+                    // wait 2 seconds with await
+                    await new Promise((resolve) => {
+                        setTimeout(() => {
+                            resolve(null)
+                        }, 2000)
+                    })
+
+                    chat1.setSeen(sentMessageId)
+                })
+            })
+        }
+
+        runTest()
+    })
+
     // it('bug fix test: should not have duplicate chats last message', (done) => {
     //     async function runTest() {
     //         const user1 = { username: "user1-duplicate-message", name: "User1" }

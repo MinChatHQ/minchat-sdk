@@ -51,7 +51,7 @@ const useMessages = (chat?: Chat, reverse?: boolean) => {
 
             //update the seen for all the messages that are not seen
             for (const message of messages) {
-                if (!message.seen) {
+                if (!message.seen && user && (message.user.id !== user.id)) {
                     chat.jsChat.setSeen(message.id)
                 }
             }
@@ -78,6 +78,31 @@ const useMessages = (chat?: Chat, reverse?: boolean) => {
             setLoading(true)
             setPaginateLoading(true)
 
+            /**
+             * 
+             */
+            chat.jsChat.onMessageSeen(messageId => {
+                setMessages((messagesValue: any) => {
+                    if (!messagesValue) return messagesValue
+
+                    const newMessages = messagesValue.map((message: FullMessage) => {
+                        if (messageId === message.id) {
+                            return {
+                                ...message,
+                                seen: true
+                            }
+                        } else {
+                            return message
+                        }
+                    })
+
+                    return newMessages
+                })
+            })
+
+            /**
+             * 
+             */
             chat.jsChat.onMessage((message: FullMessage) => {
                 /** a new message has been received */
                 if (message) {

@@ -56,6 +56,10 @@ class Chat {
     async stopTyping() {
         return this.jsChat.stopTyping()
     }
+
+    setSeen(messageId?: string | null) {
+        return this.jsChat.setSeen(messageId)
+    }
 }
 
 export default Chat

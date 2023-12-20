@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { render, screen, waitFor, } from '@testing-library/react';
 // import '@testing-library/jest-dom/extend-expect';
-import { MinChatProvider, useChats, useMessages, useMinChat } from "../src"
+import { Chat, MinChatProvider, useChats, useMessages, useMinChat } from "../src"
 import axios from "axios";
 import '@testing-library/jest-dom';
 
@@ -510,7 +510,7 @@ describe("MinChat Instance", () => {
                     expect(chats[0].getTitle()).toEqual(thirdChat?.getTitle())
 
                     for (const chat of chats) {
-           
+
                         const lastMessage = chat.getLastMessage()
 
                         if (lastMessage) {
@@ -789,6 +789,104 @@ describe("MinChat Instance", () => {
     }, 20_000)
 
 
+    /**
+     * 
+     */
+    it("should set seen and listen for message seen", async () => {
+        const user1 = { username: "user1-seen", name: "User1" }
+        const user2 = { username: "user2-seen", name: "User2" }
+
+        /**
+         * USER 1   
+         */
+        const MockComponent1 = () => {
+            const { chats } = useChats()
+
+            useEffect(() => {
+                if (chats && chats[0]) {
+                    chats[0].setSeen()
+                }
+            }, [chats])
+
+            return <div />
+        };
+
+        /**
+         * USER 2
+         */
+        const MockComponent2 = () => {
+            const minchat = useMinChat()
+            const [activeChat, setActiveChat] = React.useState<any>(null)
+
+            useEffect(() => {
+                const setup = async () => {
+                    if (minchat) {
+                        const user = await minchat.createUser(user1)
+                        const chat = await minchat.chat(user.username)
+                        setActiveChat(chat)
+                    }
+                }
+
+                setup()
+            }, [minchat])
+
+            return <div>
+                <ChildComponent2
+                    chat={activeChat} />
+            </div>;
+        };
+
+        /**
+         * 
+         */
+        const ChildComponent2 = ({ chat }: { chat: Chat }) => {
+            const [complete, setComplete] = useState(false)
+            const { sendMessage, messages } = useMessages(chat)
+
+            useEffect(() => {
+                if (messages && messages[0]?.seen === true) {
+                    setComplete(true)
+                }
+            }, [messages])
+
+            useEffect(() => {
+                async function setup() {
+
+                    if (chat) {
+                        sendMessage({ text: "Hello" })
+                    }
+                }
+
+                setup()
+
+            }, [chat])
+            return <div>{complete && "complete"}</div>;
+        };
+
+        render(
+            <MinChatProvider
+                test
+                apiKey={apiKey}
+                user={user1}>
+                <MockComponent1 />
+            </MinChatProvider>
+        );
+
+
+
+        render(
+            <MinChatProvider
+                test
+                apiKey={apiKey}
+                user={user2}>
+                <MockComponent2 />
+            </MinChatProvider>
+        );
+
+        await waitFor(() => {
+            expect(screen.getByText('complete')).toBeInTheDocument();
+        }, { timeout: 20_000 });
+    }, 20_000)
 })
 
 

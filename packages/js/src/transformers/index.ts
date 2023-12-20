@@ -19,11 +19,12 @@ export const transformUser = (user: any): User => {
 
 export const transformMessage = (message: any): FullMessage | undefined => {
     if (message) {
-        const { created_at, ...rest } = message
+        const { created_at, seen, success, ...rest } = message
 
         const response = {
             ...rest,
-            createdAt: new Date(created_at)
+            success,
+            createdAt: new Date(created_at),
         }
 
         if (message.user) {

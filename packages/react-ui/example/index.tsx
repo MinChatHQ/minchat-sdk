@@ -115,8 +115,11 @@ const App = () => {
               <MinChatUI
                 test={true}
                 user={user6}
-                // startConversation={[user1]}
-                // startConversation={["user1", "user2"]}
+                startConversation={async (minchat) => {
+                  const user = await minchat.createUser(user1)
+
+                  return user.username
+                }}
                 // groupChatTitle="Epic Gamers Group Chat"
                 apiKey={apiKey}
               />
@@ -131,11 +134,11 @@ const App = () => {
               // demo={true}
               test={true}
               // groupChatTitle='Groupies'
-              startConversation={async (minchat) => {
-                const user = await minchat.createUser(user2)
+              // startConversation={async (minchat) => {
+              //   const user = await minchat.createUser(user2)
 
-                return user.username
-              }}
+              //   return user.username
+              // }}
               user={user1}
               apiKey={apiKey}
               renderIsTyping={({ user }) => <div>{user.name} is typing</div>}
@@ -170,7 +173,11 @@ const App = () => {
               <div className='innersq'>
                 <MinChatUI
                   groupChatTitle='Redemption arc'
-                  // startConversation={[user5, user7, user2, user3, user4, user6]}
+                  startConversation={async (minchat) => {
+                    const user = await minchat.createUser(user2)
+
+                    return user.username
+                  }}
                   height='100%'
                   test={true}
                   user={user1}

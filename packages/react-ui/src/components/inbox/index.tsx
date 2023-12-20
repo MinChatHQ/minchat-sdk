@@ -183,10 +183,7 @@ export default function Inbox({
 
 
   useEffect(() => {
-    //setSeen on the selected chat
     if (selectedChat) {
-      selectedChat.jsChat.setSeen()
-
       selectedChat.onTypingStarted((user) => {
         setTypingUser(user)
       })
@@ -222,8 +219,7 @@ export default function Inbox({
    */
   const handleSendMessage = (props: { text?: string, file?: any }) => {
     setTyping(false)
-    sendMessage(props)
-    selectedChat && selectedChat.jsChat.setSeen()
+    sendMessage(props, (message) => console.log({ message }))
   }
 
   /**

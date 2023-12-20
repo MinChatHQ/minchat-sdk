@@ -60,11 +60,6 @@ class Chat {
             user: this.mainConfig.user,
             apiKey: this.mainConfig.apiKey,
         })
-
-        //set the seen for the last message that is in local to true
-        if (messageId && this.config.lastMessage) {
-            this.config.lastMessage.seen = true
-        }
     }
 
 
@@ -141,11 +136,9 @@ class Chat {
 
             //update the last message of this chat item //update it still even if the message fails to send
             this.config.lastMessage = {
-                seen: true,
                 user: this.mainConfig.user,
                 text: sendMessageData.text,
                 createdAt: dateCreated,
-                chatId: this.config.channelId,
                 metadata: sendMessageData.metadata
             }
 
@@ -172,6 +165,7 @@ class Chat {
             },
                 // callback function from the socket server which is when when the emit succeeds or fails
                 (response: any) => {
+
                     // let success = false
                     //update the channel id of the chat based on the response from the server
                     if (response && response.chat_id) {
@@ -219,6 +213,17 @@ class Chat {
         });
 
     }
+
+    /**
+     * handle on message seen
+     * @param listener 
+     */
+    onMessageSeen(listener: (messageId: string) => void) {
+        this.mainConfig?.socket?.on('message.seen', (data: any) => {
+            listener && listener(data)
+        });
+    }
+
 
     // handle user starts typing
     onTypingStarted(listener: (user: User) => void) {
