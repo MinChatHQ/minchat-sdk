@@ -7,6 +7,7 @@ import { transformMessage, transformMessagesResponse } from "./transformers";
 import { FullMessage } from "./types/full-message";
 import { MessagesResponse } from "./types/messages-response";
 import { prepareFileForUpload } from "./utils/file-utils";
+import { Status } from "./enums/status";
 
 
 
@@ -269,6 +270,56 @@ class Chat {
             user: this.mainConfig.user,
             apiKey: this.mainConfig.apiKey,
         })
+    }
+
+    /**
+     * 
+     */
+    async onMemberStatusChanged(listener: (memberId: string, status: Status) => void) {
+        //this onMemberStatusChanged simply executes whenever i add the listener and returns the other participants that are connected to the socket
+        //it also invokes when participants connect or disconnects from the socket
+        // actual logic simply uses polling the socket to check if a user is currently online
+        const makeQuery = () => {
+            // check for each member of the chat if they are online
+            for (const memberId of this.config.memberIds) {
+                this.mainConfig?.socket?.emit('user.status', {
+                    memberId,
+                    apiKey: this.mainConfig.apiKey,
+                },
+                    (data: { memberId: string, status: string }) => {
+                        let status: Status | null = null
+
+                        // check if the status differs from the already existing status and only execute if its different
+                        switch (data.status) {
+                            case "online":
+                                // should not previously be in the online array
+                                if (!this.config.memberIdsOnline.includes(data.memberId)) {
+                                    status = Status.ONLINE
+                                    this.config.memberIdsOnline.push(data.memberId)
+                                }
+                                break
+                            default:
+                                if (this.config.memberIdsOnline.includes(data.memberId)) {
+                                    status = Status.OFFLINE
+                                    this.config.memberIdsOnline = this.config.memberIdsOnline.filter(id => id !== data.memberId)
+                                }
+                                break
+                        }
+
+
+                        if (status !== null) {
+                            listener && listener(data.memberId, status)
+                        }
+                    })
+            }
+        }
+
+        // execute the first time
+        makeQuery()
+
+        // if its 1 on 1 conversation then check every 10 seconds, for group chats check every 5 minutes
+        const interval = this.config.memberIds.length === 1 ? 10_000 : (60_000 * 5)
+        setInterval(makeQuery, interval)
     }
 
 

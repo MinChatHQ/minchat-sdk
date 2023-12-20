@@ -1,5 +1,6 @@
 import MinChat, { } from '..';
 import { LOCALHOST_PATH } from '../configs/config';
+import { Status } from '../enums/status';
 import { UserProps } from '../types/user-props';
 import getAxios from '../utils/get-axios';
 
@@ -30,6 +31,8 @@ describe("MinChat Instance", () => {
 
             const instance1 = await prepareInstance(user1)
             const user2 = await instance1.createUser({ username: "user2", name: "User2" })
+            expect(user2.lastActive).toBeDefined()
+
             const chat = await instance1.chat(user2.username)
             chat?.sendMessage({ text: "Hey" }, async () => {
                 const chatsResponse = await instance1.getChats()
@@ -47,6 +50,7 @@ describe("MinChat Instance", () => {
 
         const instance1 = await prepareInstance(user1)
         const user2 = await instance1.createUser({ username: "user2", name: "User2" })
+        expect(user2.lastActive).toBeDefined()
         await instance1.chat(user2.username)
 
         const chatsResponse = await instance1.getChats()
@@ -385,8 +389,10 @@ describe("MinChat Instance", () => {
                 const chat2 = chats[0]
 
 
-                chat2?.onMessageSeen((messageId) => {
+                chat2?.onMessageSeen(async (messageId) => {
                     expect(messageId).toBe(sentMessageId)
+                    const { messages } = await chat2.getMessages()
+                    expect(messages[1].seen).toBe(true)
                     done()
                 })
 
@@ -408,6 +414,59 @@ describe("MinChat Instance", () => {
         runTest()
     })
 
+
+    it("should show user is active and update last seen", (done) => {
+        async function runTest() {
+            let user1: any = { username: "user1-active", name: "User1" }
+            let user2: any = { username: "user2-active", name: "User2" }
+
+            const instance = MinChat.getInstance(apiKey)
+            instance.init({ test: true, demo: false })
+            user1 = await instance.createUser(user1)
+            user2 = await instance.createUser(user2)
+
+            expect(user1.lastActive).toBeDefined()
+            expect(user2.lastActive).toBeDefined()
+
+            const instance1 = await prepareInstance({ username: user1.username, name: user1.name })
+
+            let expectsRun = 0
+            function finalize() {
+                expectsRun++
+                if (expectsRun >= 2) {
+                    done()
+                }
+            }
+
+            const chat1 = await instance1.chat(user2.username)
+            // testing before a second user joins the chat so the memberStatusChanged updates after the user joins
+            chat1?.onMemberStatusChanged(async (memberId, status) => {
+                expect(memberId).toBe(user2.id)
+                expect(status).toBe(Status.ONLINE)
+                const user = await instance.fetchUserById(user2.id)
+                expect(user.lastActive).toBeDefined()
+                expect(user.lastActive).not.toBe(user2.lastActive)
+                finalize()
+            })
+
+            const instance2 = await prepareInstance({ username: user2.username, name: user2.name })
+            const chat2 = await instance2.chat(user1.username)
+
+            // testing while there was already a user active in the chat
+            chat2?.onMemberStatusChanged(async (memberId, status) => {
+                expect(memberId).toBe(user1.id)
+                expect(status).toBe(Status.ONLINE)
+                const user = await instance.fetchUserById(user1.id)
+                expect(user.lastActive).toBeDefined()
+                expect(user.lastActive).not.toBe(user1.lastActive)
+                finalize()
+            })
+
+
+        }
+
+        runTest()
+    }, 30_000)
     // it('bug fix test: should not have duplicate chats last message', (done) => {
     //     async function runTest() {
     //         const user1 = { username: "user1-duplicate-message", name: "User1" }

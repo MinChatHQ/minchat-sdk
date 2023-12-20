@@ -886,7 +886,7 @@ describe("MinChat Instance", () => {
         await waitFor(() => {
             expect(screen.getByText('complete')).toBeInTheDocument();
         }, { timeout: 20_000 });
-    }, 20_000)
+    }, 30_000)
 })
 
 

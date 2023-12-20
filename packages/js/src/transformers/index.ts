@@ -9,17 +9,19 @@ import Config from "../configs/config";
  * transform the data from the api into a user object
  */
 export const transformUser = (user: any): User => {
-    const { created_at, ...rest } = user
+    const { created_at, last_active, ...rest } = user
 
     return {
         ...rest,
-        createdAt: new Date(created_at)
+        createdAt: new Date(created_at),
+        lastActive: new Date(last_active)
+
     }
 }
 
 export const transformMessage = (message: any): FullMessage | undefined => {
     if (message) {
-        const { created_at, seen, success, ...rest } = message
+        const { created_at, success, ...rest } = message
 
         const response = {
             ...rest,
@@ -56,7 +58,7 @@ export const transformChat = (serverChat: any, config: Config) => {
     const chat = new Chat(config)
     chat.config.channelId = serverChat.id
     chat.config.title = serverChat.title
-    chat.config.memberIds = serverChat.participant_user_ids
+    chat.config.memberIds = serverChat.participant_user_ids.filter((id: string) => id !== config.user?.id)
     chat.config.lastMessage = transformMessage(serverChat.last_message)
     chat.config.createdAt = new Date(serverChat.created_at)
 

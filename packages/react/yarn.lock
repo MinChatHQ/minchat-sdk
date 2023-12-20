@@ -1423,10 +1423,10 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@minchat/js@^2.6.0":
-  version "2.6.0"
-  resolved "https://registry.npmjs.org/@minchat/js/-/js-2.6.0.tgz"
-  integrity sha512-PYf9Y1dgh5uLY5S8xUcyHP3FYQM+aet0Y4wfA4uA6ivPy6EGoq2xOU8SH3toZWvyibbbCItz8utLM109Y66y+A==
+"@minchat/js@^2.7.4":
+  version "2.7.4"
+  resolved "https://registry.npmjs.org/@minchat/js/-/js-2.7.4.tgz"
+  integrity sha512-Khjwh9SYGP2IDSV2LUvZk6YOxuEadJedrnqRaIpKe23AFwCcAJGAKKs90bd4VDJLtf3P8p2in+140WRYLWEAVA==
   dependencies:
     axios "^0.27.2"
     socket.io-client "^4.7.2"

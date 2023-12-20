@@ -133,12 +133,8 @@ const App = () => {
             <MinChatUI
               // demo={true}
               test={true}
-              // groupChatTitle='Groupies'
-              // startConversation={async (minchat) => {
-              //   const user = await minchat.createUser(user2)
+              groupChatTitle='Groupies'
 
-              //   return user.username
-              // }}
               user={user1}
               apiKey={apiKey}
               renderIsTyping={({ user }) => <div>{user.name} is typing</div>}
@@ -149,10 +145,12 @@ const App = () => {
             <MinChatUI
               test={true}
               // demo={true}
-              // startConversation={async (minchat) => {
-              //   const user = await minchat.createUser(user1)
-              //   return user.username
-              // }}
+              startConversation={async (minchat) => {
+                const u1 = await minchat.createUser(user1)
+                const u3 = await minchat.createUser(user3)
+
+                return [u1.username, u3.username]
+              }}
               user={user2}
               apiKey={apiKey}
               mobileView={false}

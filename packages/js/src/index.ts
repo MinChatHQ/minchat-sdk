@@ -10,6 +10,7 @@ import { FullMessage } from "./types/full-message"
 import { GroupChatProps } from "./types/group-chat-props"
 import { MessagesResponse } from "./types/messages-response"
 import { SendMessage } from "./types/send-message"
+import { Status } from "./enums/status"
 
 class MinChat {
    static getInstance(MINCHAT_API_KEY: string): MinChatInstance {
@@ -32,9 +33,9 @@ class MinChat {
 // }
 
 
+
 export {
    Chat,
-   
    ChatsResponse,
    File,
    AltFile,
@@ -44,7 +45,8 @@ export {
    FullMessage,
    GroupChatProps,
    MessagesResponse,
-   SendMessage
+   SendMessage,
+   Status
 }
 
 

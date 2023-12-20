@@ -1,6 +1,4 @@
-import ChatJS from "@minchat/js/dist/chat";
-import { FullMessage } from "@minchat/js/dist/types/full-message";
-import { User } from "@minchat/js/dist/types/user";
+import { FullMessage, User,Chat as ChatJS, Status } from "@minchat/js";
 
 class Chat {
     jsChat: ChatJS
@@ -47,6 +45,10 @@ class Chat {
     }
     onTypingStarted(listener: (user: User) => void) {
         return this.jsChat.onTypingStarted(listener)
+    }
+
+    async onMemberStatusChanged(listener: (memberId: string, status: Status) => void) {
+        return this.jsChat.onMemberStatusChanged(listener)
     }
 
     async startTyping() {

@@ -1,5 +1,5 @@
 {
-  "version": "2.6.0",
+  "version": "2.7.0",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -79,8 +79,8 @@
   },
   "dependencies": {
     "@minchat/js": "^2.5.7",
-    "@minchat/react": "^2.7.0",
-    "@minchat/react-chat-ui": "^0.13.4",
+    "@minchat/react": "^2.8.4",
+    "@minchat/react-chat-ui": "^0.13.17",
     "postcss": "^8.4.19",
     "react-router-dom": "^5.2.0",
     "rollup": "^2.79.1",

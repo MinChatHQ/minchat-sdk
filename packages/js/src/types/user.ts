@@ -4,6 +4,7 @@ export type User = {
     name: string
     avatar?: string
     createdAt: Date
+    lastActive: Date
     metadata?: Record<string, string | number>
 }
 

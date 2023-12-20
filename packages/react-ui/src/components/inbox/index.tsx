@@ -20,7 +20,7 @@ import ConversationType from '@minchat/react-chat-ui/dist/ConversationType';
 import MinChatInstanceReact from '@minchat/react/dist/MinChatInstanceReact';
 import { RenderProps } from '../..';
 import useThrottle from '../../hooks/useThrottle';
-
+import { Status } from '@minchat/js';
 
 interface Props extends RenderProps {
   // start a conversation with one or more users
@@ -53,6 +53,7 @@ export default function Inbox({
   renderChatItem = () => undefined,
   renderChatList = ({ connectedUser, chats, loading, selectedChat, paginate, openChat, isMobile }) => <ConversationList
     mobileView={isMobile}
+    themeColor={themeColor}
     currentUserId={connectedUser.id}
     loading={loading}
     selectedConversationId={selectedChat ? selectedChat.getId() : undefined}
@@ -80,7 +81,13 @@ export default function Inbox({
     })}
     onScrollToBottom={() => paginate()}
   />,
-  renderMessageListHeader = ({ heading, clearMessageList, isMobile }) => <MessageHeader mobileView={isMobile} showBack={isMobile} onBack={clearMessageList}> {heading}</MessageHeader>,
+  renderMessageListHeader = ({ heading, clearMessageList, isMobile, lastActive }) => {
+    return <MessageHeader
+      lastActive={lastActive}
+      mobileView={isMobile}
+      showBack={isMobile}
+      onBack={clearMessageList}> {heading}</MessageHeader>
+  },
   renderIsTyping = () => undefined,
   renderMessageList = ({ loading, messages, paginate, connectedUser, typingUser, isMobile }) => <MessageList
     mobileView={isMobile}
@@ -93,7 +100,6 @@ export default function Inbox({
     customLoaderComponent={(() => renderLoader({ isMobile }))()}
     messages={messages && messages.map((ogMessage) => {
       const { createdAt, ...message } = ogMessage
-
       if (message.file) {
         return {
           ...message,
@@ -112,6 +118,7 @@ export default function Inbox({
   />,
   renderInput = ({ sendMessage, sendFile, inputProps, isMobile }) => <MessageInput
     mobileView={isMobile}
+    themeColor={themeColor}
     {...inputProps}
     onAttachClick={sendFile}
     onSendMessage={sendMessage} />,
@@ -122,6 +129,7 @@ export default function Inbox({
 
   const [selectedChat, setSelectedChat] = useState<Chat | null>()
   const [typingUser, setTypingUser] = useState<User | undefined>()
+  const [lastOnline, setLastOnline] = useState<Date | undefined>()
 
   const fileInputRef = React.createRef<any>();
 
@@ -156,6 +164,7 @@ export default function Inbox({
         }
 
         if (usernames.length === 1 && !groupChatTitle) {
+
           chat = await minchat.chat((usernames)[0])
         } else {
           //it is a group chat with multiple people
@@ -181,17 +190,51 @@ export default function Inbox({
     }
   }, [chats, chatsOrdered])
 
+  let lastActiveIntervalId: any
+
 
   useEffect(() => {
-    if (selectedChat) {
-      selectedChat.onTypingStarted((user) => {
-        setTypingUser(user)
-      })
+    // clear the interval when the selected chat changes
+    clearInterval(lastActiveIntervalId)
+    setLastOnline(undefined)
 
-      selectedChat.onTypingStopped((_) => {
-        setTypingUser(undefined)
-      })
+    async function init() {
+      if (selectedChat) {
+        selectedChat.onTypingStarted((user) => {
+          setTypingUser(user)
+        })
+
+        selectedChat.onTypingStopped((_) => {
+          setTypingUser(undefined)
+        })
+
+        const memberIds = selectedChat.getMemberIds()
+
+        if (memberIds.length === 1 && minchat) {
+          // query last active
+          const user = await minchat.fetchUserById(memberIds[0])
+          setLastOnline(user.lastActive)
+          // add listener
+          selectedChat.onMemberStatusChanged((_, status) => {
+            if (status === Status.ONLINE) {
+              lastActiveIntervalId = setInterval(() => {
+                setLastOnline(new Date())
+              }, 50_000)
+
+              setLastOnline(new Date())
+            } else {
+              // its offline so disable the online interval update
+              clearInterval(lastActiveIntervalId)
+            }
+          })
+        } else {
+          setLastOnline(undefined)
+        }
+      }
     }
+
+    init()
+
   }, [selectedChat])
 
 
@@ -219,7 +262,7 @@ export default function Inbox({
    */
   const handleSendMessage = (props: { text?: string, file?: any }) => {
     setTyping(false)
-    sendMessage(props, (message) => console.log({ message }))
+    sendMessage(props)
   }
 
   /**
@@ -246,7 +289,8 @@ export default function Inbox({
   const MessageListHeaderComponent = () => renderMessageListHeader({
     heading: (selectedChat && selectedChat.getTitle()) || "",
     clearMessageList: () => setSelectedChat(undefined),
-    isMobile: determineIsMobile()
+    isMobile: determineIsMobile(),
+    lastActive: lastOnline
   })
 
   /**

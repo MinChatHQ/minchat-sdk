@@ -6,7 +6,9 @@ class ChatConfig {
     channelId?: string = undefined
     members: User[] = []
     memberIds: string[] = []
-
+    
+    // keeps track of the members of the chat that are online
+    memberIdsOnline: string[] = []
 
     title: string = ""
     lastMessage?: FullMessage
