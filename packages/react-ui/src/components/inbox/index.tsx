@@ -28,6 +28,7 @@ interface Props extends RenderProps {
   groupChatTitle?: string
   mobileView?: boolean
   showAttach?: boolean
+  demo: boolean
 }
 
 interface ContainerProps {
@@ -44,7 +45,7 @@ export default function Inbox({
   groupChatTitle,
   mobileView,
   showAttach = true,
-
+  demo,
   // render props
   renderEmptyMessages = () => undefined,
   renderEmptyChats = () => undefined,
@@ -82,7 +83,7 @@ export default function Inbox({
   />,
   renderMessageListHeader = ({ heading, clearMessageList, isMobile, lastActive }) => {
     return <MessageHeader
-      lastActive={lastActive}
+      lastActive={demo ? new Date() : lastActive}
       mobileView={isMobile}
       showBack={isMobile}
       onBack={clearMessageList}> {heading}</MessageHeader>

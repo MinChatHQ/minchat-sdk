@@ -102,6 +102,7 @@ const App = () => {
           <MinChatUI
             test={true}
             user={user3}
+            demo
             // startConversation={[user1, user2, user4]}
             // startConversation={["user1", "user2"]}
             // groupChatTitle="Epic Gamers Group Chat"

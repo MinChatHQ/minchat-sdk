@@ -141,6 +141,7 @@ export const MinChatUI: FC<Props> = ({
       theme={theme}>
       <UiContext.Provider value={{ height }}>
         <Inbox
+        demo={demo}
           {...restProps}
         />
       </UiContext.Provider>
