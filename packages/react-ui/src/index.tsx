@@ -4,6 +4,7 @@ import Inbox from './components/inbox';
 import UiContext from './UiContext';
 import './index.css'
 import MinChatInstanceReact from '@minchat/react/dist/MinChatInstanceReact';
+import { MinChatUiProvider } from '@minchat/react-chat-ui';
 
 type RenderInputProps = {
   sendMessage: (text?: string) => void
@@ -107,7 +108,9 @@ export interface Props extends RenderProps {
   demo?: boolean
   test?: boolean
   mobileView?: boolean
-  themeColor?: string
+  theme?: string
+  colorSet?: {}
+  showAttach?: boolean
 }
 
 export {
@@ -123,7 +126,8 @@ export const MinChatUI: FC<Props> = ({
   height = "full",
   demo = false,
   test = false,
-  themeColor = '#6ea9d7',
+  theme = '#6ea9d7',
+  colorSet,
   ...restProps
 
 }) => {
@@ -132,11 +136,14 @@ export const MinChatUI: FC<Props> = ({
     test={test}
     user={!demo ? user : { username: "martha", name: "Martha" }}
     apiKey={apiKey}>
-    <UiContext.Provider value={{ height }}>
-      <Inbox
-        themeColor={themeColor}
-        {...restProps}
-      />
-    </UiContext.Provider>
+    <MinChatUiProvider
+      colorSet={colorSet}
+      theme={theme}>
+      <UiContext.Provider value={{ height }}>
+        <Inbox
+          {...restProps}
+        />
+      </UiContext.Provider>
+    </MinChatUiProvider >
   </MinChatProvider>
 };

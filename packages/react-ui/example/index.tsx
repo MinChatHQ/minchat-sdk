@@ -122,6 +122,17 @@ const App = () => {
                 }}
                 // groupChatTitle="Epic Gamers Group Chat"
                 apiKey={apiKey}
+                theme='black'
+                colorSet={{
+                  //outgoing message
+                  "--outgoing-message-text-color": "#FF0000",
+                  "--outgoing-message-background-color": "rgb(255, 255, 0)",
+                  "--outgoing-message-timestamp-color": "#FF0000",
+                  "--outgoing-message-checkmark-color": "#FF0000",
+                  "--outgoing-message-loader-color": "#FF0000",
+                  "--outgoing-message-link-color": "rgb(0, 128, 0)",
+                  "--messagelist-background-color": "pink",
+                }}
               />
             </div>
           </div>

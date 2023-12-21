@@ -16,7 +16,7 @@ import {
   useTypingListener,
   MessageContainer,
 } from "@minchat/react-chat-ui";
-import ConversationType from '@minchat/react-chat-ui/dist/ConversationType';
+import ConversationType from '@minchat/react-chat-ui/dist/types/ConversationType';
 import MinChatInstanceReact from '@minchat/react/dist/MinChatInstanceReact';
 import { RenderProps } from '../..';
 import useThrottle from '../../hooks/useThrottle';
@@ -27,7 +27,7 @@ interface Props extends RenderProps {
   startConversation?: (minchat: MinChatInstanceReact) => Promise<string | Array<string>> | string | Array<string>
   groupChatTitle?: string
   mobileView?: boolean
-  themeColor: string
+  showAttach?: boolean
 }
 
 interface ContainerProps {
@@ -43,7 +43,7 @@ export default function Inbox({
   startConversation,
   groupChatTitle,
   mobileView,
-  themeColor,
+  showAttach = true,
 
   // render props
   renderEmptyMessages = () => undefined,
@@ -53,7 +53,6 @@ export default function Inbox({
   renderChatItem = () => undefined,
   renderChatList = ({ connectedUser, chats, loading, selectedChat, paginate, openChat, isMobile }) => <ConversationList
     mobileView={isMobile}
-    themeColor={themeColor}
     currentUserId={connectedUser.id}
     loading={loading}
     selectedConversationId={selectedChat ? selectedChat.getId() : undefined}
@@ -91,7 +90,6 @@ export default function Inbox({
   renderIsTyping = () => undefined,
   renderMessageList = ({ loading, messages, paginate, connectedUser, typingUser, isMobile }) => <MessageList
     mobileView={isMobile}
-    themeColor={themeColor}
     typingIndicatorContent={typingUser ? `${typingUser.name} is typing` : ""}
     customTypingIndicatorComponent={(() => typingUser ? renderIsTyping({ user: typingUser, isMobile }) : undefined)()}
     showTypingIndicator={typingUser ? true : false}
@@ -118,8 +116,8 @@ export default function Inbox({
   />,
   renderInput = ({ sendMessage, sendFile, inputProps, isMobile }) => <MessageInput
     mobileView={isMobile}
-    themeColor={themeColor}
     {...inputProps}
+    showAttachButton={showAttach}
     onAttachClick={sendFile}
     onSendMessage={sendMessage} />,
 
