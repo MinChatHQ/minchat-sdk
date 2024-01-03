@@ -8,6 +8,7 @@ import { User } from "./types/user"
 import { UserProps } from "./types/user-props"
 import { FullMessage } from "./types/full-message"
 import { GroupChatProps } from "./types/group-chat-props"
+import { SingleChatProps } from "./types/single-chat-props"
 import { MessagesResponse } from "./types/messages-response"
 import { SendMessage } from "./types/send-message"
 import { Status } from "./enums/status"
@@ -46,7 +47,8 @@ export {
    GroupChatProps,
    MessagesResponse,
    SendMessage,
-   Status
+   Status,
+   SingleChatProps
 }
 
 

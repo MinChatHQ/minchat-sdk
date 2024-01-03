@@ -5,4 +5,7 @@ export type GroupChatProps = {
     // memberIds?: string[]
     title?: string
     avatar?: string | File | AltFile
+
+    metadata?: Record<string, string | number | boolean>
+
 }

@@ -3,6 +3,7 @@ import Config from "./configs/config"
 import { transformChat, transformChatsResponse, transformUser } from "./transformers";
 import { ChatsResponse } from "./types/chats-response";
 import { GroupChatProps } from "./types/group-chat-props";
+import { SingleChatProps } from "./types/single-chat-props";
 import { UpdateUserProps } from "./types/update-user-props";
 import { User } from "./types/user"
 import { UserProps } from "./types/user-props";
@@ -26,7 +27,7 @@ export class MinChatInstance {
     /**
    * 
    */
-    async getChats(page?: number, callback?: (chats: ChatsResponse) => void): Promise<ChatsResponse> {
+    async getChats(page?: number): Promise<ChatsResponse> {
         await this.config.waitForInstanceReady()
 
         if (this.config.user || this.config.demo) {
@@ -44,9 +45,6 @@ export class MinChatInstance {
                     params
                 })
 
-                //pass the data into the callback
-                callback && callback(response.data)
-
                 //return the data in the function if using async await
                 return transformChatsResponse(response.data, this.config)
 
@@ -63,14 +61,13 @@ export class MinChatInstance {
             totalPages: 0,
         }
 
-        callback && callback(response)
         return response
     }
 
     onChat(listener: (chat: Chat) => void) {
         this.config.socket?.on('chat', async (data) => {
             if (data.success) {
-                const chat = await transformChat(data, this.config)
+                const chat =  transformChat(data, this.config)
                 listener && listener(chat)
             }
         });
@@ -98,7 +95,7 @@ export class MinChatInstance {
     }
 
 
-    async fetchUser(username: string, callback?: (user: User) => void): Promise<User> {
+    async fetchUser(username: string): Promise<User> {
         const response = await axios.get((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/user', {
             headers: {
                 'Authorization': "Bearer " + this.config.apiKey
@@ -108,11 +105,10 @@ export class MinChatInstance {
             }
         })
 
-        callback && callback(response.data.user)
         return transformUser(response.data.user)
     }
 
-    async fetchUserById(id: string, callback?: (user: User) => void): Promise<User> {
+    async fetchUserById(id: string): Promise<User> {
         const response = await axios.get((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/user', {
             headers: {
                 'Authorization': "Bearer " + this.config.apiKey
@@ -122,12 +118,11 @@ export class MinChatInstance {
             }
         })
 
-        callback && callback(response.data.user)
         return transformUser(response.data.user)
     }
 
 
-    async updateUserById(userId: string, user: UpdateUserProps, callback?: (user: User) => void): Promise<User> {
+    async updateUserById(userId: string, user: UpdateUserProps): Promise<User> {
         const { avatar, metadata, ...restUser } = user
         const data = new FormData()
 
@@ -156,12 +151,11 @@ export class MinChatInstance {
                 },
             })
 
-        callback && callback(response.data.user)
         return transformUser(response.data.user)
     }
 
 
-    async createUser(user: UserProps, callback?: (user: User) => void): Promise<User> {
+    async createUser(user: UserProps): Promise<User> {
         const { avatar, metadata, ...restUser } = user
         const data = new FormData()
 
@@ -186,11 +180,10 @@ export class MinChatInstance {
             },
         })
 
-        callback && callback(response.data.user)
         return transformUser(response.data.user)
     }
 
-    async getUsers(usernames: string[], callback?: (chats: User[]) => void): Promise<User[]> {
+    async getUsers(usernames: string[]): Promise<User[]> {
 
         const response = await axios.get((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/user/list', {
             headers: {
@@ -208,12 +201,11 @@ export class MinChatInstance {
             users.push(transformUser(user))
         })
 
-        callback && callback(users)
         return users
     }
 
 
-    async connectUser(user: UserProps, callback?: (chats: MinChatInstance) => void): Promise<MinChatInstance> {
+    async connectUser(user: UserProps): Promise<MinChatInstance> {
         if (user) {
             if (this.config.user?.id) {
                 //remove old user from listening to the user room events if user variable is defined
@@ -234,7 +226,6 @@ export class MinChatInstance {
             })
         }
 
-        callback && callback(this)
         return this
     }
 
@@ -242,7 +233,7 @@ export class MinChatInstance {
         return this.config.user
     }
 
-    async chat(withUsername: string, callback?: (chats: Chat | null) => void): Promise<Chat | undefined> {
+    async chat(withUsername: string, options?: SingleChatProps): Promise<Chat | undefined> {
         await this.config.waitForInstanceReady()
 
         if (this.config.user) {
@@ -252,7 +243,8 @@ export class MinChatInstance {
             try {
                 const response = await axios.post((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/chat', {
                     usernames: [this.config.user.username, withUsername],
-                    user_id: this.config.user.id
+                    user_id: this.config.user.id,
+                    metadata: options?.metadata
                 }, {
                     headers: {
                         'Authorization': "Bearer " + this.config.apiKey
@@ -262,23 +254,22 @@ export class MinChatInstance {
                 chat.config.members = members
                 chat.config.memberIds = response.data.participant_user_ids?.filter((id: string) => id !== this.config.user?.id)
                 chat.config.channelId = response.data.id
+                chat.config.metadata = response.data.metadata
                 chat.config.avatar = members[0]?.avatar
                 chat.config.title = members[0]?.name && members[0]?.name.trim().length > 0 ? members[0].name : "No Name"
 
             } catch (e) {
                 console.log(e)
-                callback && callback(null)
                 return undefined
             }
 
-            callback && callback(chat)
             return chat
         } else {
             return undefined
         }
     }
 
-    async groupChat({ memberUsernames, title, avatar }: GroupChatProps, callback?: (chats: Chat | null) => void): Promise<Chat | undefined> {
+    async groupChat({ memberUsernames, title, avatar, metadata }: GroupChatProps): Promise<Chat | undefined> {
         await this.config.waitForInstanceReady()
 
         if (this.config.user) {
@@ -290,11 +281,12 @@ export class MinChatInstance {
             data.append("user_id", this.config.user.id)
             title && data.append("title", title)
             data.append("usernames", this.config.user.username)
+            metadata && data.append("metadata", JSON.stringify(metadata))
 
             for (const username of memberUsernames) {
                 data.append("usernames", username)
-
             }
+
 
             if (avatar) {
                 if (typeof avatar === "string") {
@@ -318,10 +310,10 @@ export class MinChatInstance {
             chat.config.members = await this.getUsers(memberUsernames)
             chat.config.memberIds = response.data.participant_user_ids?.filter((id: string) => id !== this.config.user?.id)
             chat.config.channelId = response.data.id
+            chat.config.metadata = response.data.metadata
             chat.config.avatar = response.data.avatar
             chat.config.title = response.data.title && response.data.title.trim().length > 0 ? response.data.title.trim() : "Group Chat"
 
-            callback && callback(chat)
             return chat
         } else {
             return undefined

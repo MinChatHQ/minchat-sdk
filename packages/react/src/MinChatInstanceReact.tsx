@@ -1,4 +1,4 @@
-import MinChatJs from "@minchat/js"
+import MinChatJs, { SingleChatProps } from "@minchat/js"
 
 import Chat from "./chat";
 import { ManagerOptions, SocketOptions } from "socket.io-client";
@@ -41,21 +41,21 @@ class MinChatInstanceReact {
     }
 
 
-    async createUser(user: UserProps, callback?: (user: User) => void): Promise<User> {
-        return await this.instance.createUser(user, callback)
+    async createUser(user: UserProps): Promise<User> {
+        return await this.instance.createUser(user)
     }
 
-    async fetchUser(username: string, callback?: (user: User) => void): Promise<User> {
-        return await this.instance.fetchUser(username, callback)
+    async fetchUser(username: string): Promise<User> {
+        return await this.instance.fetchUser(username)
     }
 
-    async fetchUserById(id: string, callback?: (user: User) => void): Promise<User> {
-        return await this.instance.fetchUserById(id, callback)
+    async fetchUserById(id: string): Promise<User> {
+        return await this.instance.fetchUserById(id)
     }
 
 
-    async updateUserById(userId: string, user: UpdateUserProps, callback?: (user: User) => void): Promise<User> {
-        return await this.instance.updateUserById(userId, user, callback)
+    async updateUserById(userId: string, user: UpdateUserProps): Promise<User> {
+        return await this.instance.updateUserById(userId, user)
 
     }
 
@@ -65,14 +65,13 @@ class MinChatInstanceReact {
         return this
     }
 
-    async chat(withUsername: string, callback?: (chats: Chat | null) => void): Promise<Chat | null> {
+    async chat(withUsername: string, options?: SingleChatProps): Promise<Chat | null> {
         //check if the chat already exists in the chats json object
         if (this.chats[withUsername]) {
             const foundChat = this.chats[withUsername]
-            callback && callback(foundChat)
             return foundChat
         } else {
-            const jsChat = await this.instance.chat(withUsername)
+            const jsChat = await this.instance.chat(withUsername, options)
             let chat = null
 
             if (jsChat) {
@@ -80,12 +79,11 @@ class MinChatInstanceReact {
                 this.chats[withUsername] = chat
             }
 
-            callback && callback(chat)
             return chat
         }
     }
 
-    async groupChat(params: GroupChatProps, callback?: (chats: Chat | null) => void): Promise<Chat | null> {
+    async groupChat(params: GroupChatProps): Promise<Chat | null> {
         //put the id's of the users in the group chat into a string array
         // const ids = params.members.map(member => member.id)
         //sort the array
@@ -113,7 +111,6 @@ class MinChatInstanceReact {
         }
         // this.chats[joinedId] = chat
 
-        callback && callback(chat)
         return chat
         // }
     }

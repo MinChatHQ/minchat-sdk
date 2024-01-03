@@ -1,4 +1,4 @@
-import { FullMessage, User,Chat as ChatJS, Status } from "@minchat/js";
+import { FullMessage, User, Chat as ChatJS, Status } from "@minchat/js";
 
 class Chat {
     jsChat: ChatJS
@@ -38,6 +38,14 @@ class Chat {
 
     getMemberIds(): string[] {
         return this.jsChat.getMemberIds()
+    }
+
+    getMetadata() {
+        return this.jsChat.getMetadata()
+    }
+
+    async setMetaData(metadata: Record<string, string | number | boolean>) {
+        return this.jsChat.setMetaData(metadata)
     }
 
     onTypingStopped(listener: (user: User) => void) {

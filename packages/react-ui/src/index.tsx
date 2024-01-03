@@ -104,6 +104,7 @@ export interface Props extends RenderProps {
   height?: string | "full"
   // start a conversation with one or more users
   startConversation?: (minchat: MinChatInstanceReact) => Promise<string | Array<string>> | string | Array<string>
+  startConversationMetadata?: Record<string, string | number | boolean>
   groupChatTitle?: string
   demo?: boolean
   test?: boolean
@@ -141,7 +142,7 @@ export const MinChatUI: FC<Props> = ({
       theme={theme}>
       <UiContext.Provider value={{ height }}>
         <Inbox
-        demo={demo}
+          demo={demo}
           {...restProps}
         />
       </UiContext.Provider>

@@ -23,6 +23,37 @@ class Chat {
         this.config = new ChatConfig()
     }
 
+    async setMetaData(metadata: Record<string, string | number | boolean>) {
+        if (this.config.channelId) {
+
+            try {
+
+                //todo dynamically switch url between development and production
+                const response = await axios.patch((this.mainConfig.test ? this.mainConfig.localhostPath : this.mainConfig.productionPath) + '/v1/chat/' + this.config.channelId, {
+                    metadata
+                },
+                    {
+                        headers: {
+                            Authorization: "Bearer " + this.mainConfig.apiKey
+                        },
+                    })
+
+                //update the channel id if one does not already exists
+                if (response.data.metadata) {
+                    this.config.metadata = response.data.metadata
+                }
+
+                return response.data.metadata
+            } catch (e) {
+                console.log(e)
+            }
+
+        }
+    }
+
+    getMetadata() {
+        return this.config.metadata
+    }
 
     getId() {
         return this.config.channelId
@@ -68,7 +99,7 @@ class Chat {
     /**
      * 
      */
-    async getMessages(page?: number, callback?: (messages: MessagesResponse) => void): Promise<MessagesResponse> {
+    async getMessages(page?: number): Promise<MessagesResponse> {
         await this.mainConfig.waitForInstanceReady()
 
         if (this.mainConfig.user || this.mainConfig.demo) {
@@ -98,7 +129,6 @@ class Chat {
                 this.joinRoom()
 
                 const messagesResponse = transformMessagesResponse(response.data)
-                callback && callback(messagesResponse)
 
                 return messagesResponse
             } catch (e) {
@@ -115,9 +145,7 @@ class Chat {
             totalPages: 0,
         }
 
-        callback && callback(response)
         return response
-
     }
 
     /**

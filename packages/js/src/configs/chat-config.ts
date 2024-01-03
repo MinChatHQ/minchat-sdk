@@ -17,6 +17,9 @@ class ChatConfig {
     avatar?: string
 
     createdAt?: Date
+
+    metadata?: Record<string, string | number | boolean>
+
 }
 
 export default ChatConfig

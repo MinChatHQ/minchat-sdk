@@ -418,8 +418,6 @@ describe("MinChat Instance", () => {
 
             useEffect(() => {
                 const verify = async () => {
-                    // console.log(chats?.map(chat => ({ text: chat.getLastMessage()?.text, id: chat.getId() })))
-
                     //verify that the chats dont all have the same last message which would indicate an error
                     if (chats?.length === 3) {
                         // wait 10 seconds for any additional messages to get
@@ -515,14 +513,17 @@ describe("MinChat Instance", () => {
 
                         if (lastMessage) {
                             expect(chat.getLastMessage()?.createdAt).toBeDefined()
+                            expect(chats[0].getMetadata()?.test).toEqual(true)
                         }
                     }
 
                     const setupChat = async () => {
                         if (minchat) {
                             const createdUser2 = await minchat.createUser(user2)
-                            const chat = await minchat.chat(createdUser2.username)
+                            const chat = await minchat.chat(createdUser2.username, { metadata: { test: true } })
                             expect(chat?.getTitle()).toEqual(createdUser2.name)
+                            await chat?.setMetaData({ updated: true })
+                            expect(chat?.getMetadata()).toEqual({ test: true, updated: true })
 
                             setActiveChat(chat)
                         }
@@ -538,13 +539,16 @@ describe("MinChat Instance", () => {
                         // test for a new chat to appear on the chats list after you send the first message
                         const createdUser3 = await minchat.createUser({ username: 'minchat-first-message-chat', name: "First Message User" })
 
-                        const chat3 = await minchat.chat(createdUser3.username)
+                        const chat3 = await minchat.chat(createdUser3.username, { metadata: { test: true } })
+                        expect(chat3?.getMetadata()?.test).toEqual(true)
+
                         setThirdChat(chat3)
                     }
 
                     setupChat()
                 }
             }, [minchat])
+
             return <div><ChildComponent1
                 chat={activeChat} /></div>;
         };
@@ -630,6 +634,8 @@ describe("MinChat Instance", () => {
                 if (chats && chats?.length > 0) {
                     setActiveChat(chats[0])
                     expect(chats[0].getTitle()).toEqual(user1.name)
+                    expect(chats[0].getMetadata()?.test).toEqual(true)
+
 
                 }
             }, [chats])

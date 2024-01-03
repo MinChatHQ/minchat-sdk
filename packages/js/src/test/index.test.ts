@@ -33,10 +33,38 @@ describe("MinChat Instance", () => {
             const user2 = await instance1.createUser({ username: "user2", name: "User2" })
             expect(user2.lastActive).toBeDefined()
 
-            const chat = await instance1.chat(user2.username)
+            const chat = await instance1.chat(user2.username, { metadata: { test: 1 } })
+
             chat?.sendMessage({ text: "Hey" }, async () => {
                 const chatsResponse = await instance1.getChats()
                 expect(chatsResponse.chats.length).toEqual(1)
+                expect(chatsResponse.chats[0].getMetadata()?.test).toEqual(1)
+                done()
+            })
+        }
+
+        runTest()
+    })
+
+    it('should update the metadata', (done) => {
+
+        const runTest = async () => {
+            const user1 = { username: "metadata-chats", name: "User1" }
+
+            const instance1 = await prepareInstance(user1)
+            const user2 = await instance1.createUser({ username: "user2", name: "User2" })
+
+            const chat = await instance1.chat(user2.username, { metadata: { test: 3 } })
+
+            expect(chat?.getMetadata()).toEqual({ test: 3 })
+
+            await chat?.setMetaData({ updated: true })
+
+            expect(chat?.getMetadata()).toEqual({ test: 3, updated: true })
+
+            chat?.sendMessage({ text: "Hey" }, async () => {
+                const chatsResponse = await instance1.getChats()
+                expect(chatsResponse.chats[0].getMetadata()).toEqual({ test: 3, updated: true })
                 done()
             })
         }
@@ -84,6 +112,7 @@ describe("MinChat Instance", () => {
             // instance 1 should receive the response
             instance1.onChat(async (chat) => {
                 expect(chat?.getTitle()).toEqual("Group Chat")
+                expect(chat?.getMetadata()?.test2).toEqual(2)
 
                 if (user1MessageCount === 0) {
                     user1MessageCount++
@@ -124,6 +153,7 @@ describe("MinChat Instance", () => {
 
             // instance 2 should receive the initial message 
             instance2.onChat(async (chat) => {
+                expect(chat?.getMetadata()?.test2).toEqual(2)
                 expect(chat?.getTitle()).toEqual("Group Chat")
                 if (user2MessageCount === 0) {
                     user2MessageCount++
@@ -151,6 +181,7 @@ describe("MinChat Instance", () => {
             // instance 3 should receive the initial message
             instance3.onChat(async (chat) => {
                 expect(chat?.getTitle()).toEqual("Group Chat")
+                expect(chat?.getMetadata()?.test2).toEqual(2)
 
                 if (user3MessageCount === 0) {
                     user3MessageCount++
@@ -177,7 +208,12 @@ describe("MinChat Instance", () => {
             // start by user 1 sending a message to the group
             const chat1 = await instance1.groupChat({
                 memberUsernames: [instance2.config.user?.username || "", instance3.config.user?.username || ""],
+                metadata: {
+                    test2: 2
+                }
             })
+
+            expect(chat1?.getMetadata()?.test2).toEqual(2)
 
             chat1?.sendMessage({ text: "Hello" })
             messages.push("Hello")

@@ -61,7 +61,7 @@ export const transformChat = (serverChat: any, config: Config) => {
     chat.config.memberIds = serverChat.participant_user_ids.filter((id: string) => id !== config.user?.id)
     chat.config.lastMessage = transformMessage(serverChat.last_message)
     chat.config.createdAt = new Date(serverChat.created_at)
-
+    chat.config.metadata = serverChat.metadata
     chat.config.avatar = serverChat.avatar
 
     return chat

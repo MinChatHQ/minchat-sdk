@@ -12,5 +12,5 @@ export type Message = {
     createdAt?: Date
     // tracks whether the message has been seen or not
     seen?: boolean
-    metadata?: Record<string, string | number>
+    metadata?: Record<string, string | number | boolean>
 }

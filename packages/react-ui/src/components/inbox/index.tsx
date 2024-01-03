@@ -25,6 +25,7 @@ import { Status } from '@minchat/js';
 interface Props extends RenderProps {
   // start a conversation with one or more users
   startConversation?: (minchat: MinChatInstanceReact) => Promise<string | Array<string>> | string | Array<string>
+  startConversationMetadata?: Record<string, string | number | boolean>
   groupChatTitle?: string
   mobileView?: boolean
   showAttach?: boolean
@@ -42,6 +43,7 @@ const Container = styled.div<ContainerProps>`
 
 export default function Inbox({
   startConversation,
+  startConversationMetadata,
   groupChatTitle,
   mobileView,
   showAttach = true,
@@ -62,20 +64,33 @@ export default function Inbox({
     onConversationClick={index => chats && openChat(chats[index])}
     renderCustomConversationitem={(_, index) => chats ? renderChatItem({ chat: chats[index], isMobile }) : undefined}
     conversations={chats && chats.map((chat) => {
-      const lastMessage = chat.getLastMessage()
+      let lastMessage = chat.getLastMessage()
 
       const returnVal: ConversationType = {
         title: chat.getTitle(),
         avatar: chat.getChatAvatar(),
-        id: chat.jsChat.config.channelId
+        id: chat.jsChat.config.channelId,
       }
 
       if (lastMessage) {
+
         returnVal.lastMessage = {
           ...lastMessage,
           createdAt: lastMessage.createdAt,
-          media: lastMessage.file
+          media: lastMessage.file,
         }
+
+        //the selected chat is open so messages have been read
+        if (selectedChat && (selectedChat.getId() === chat.getId())) {
+          if (chat.jsChat.config.lastMessage &&
+            chat.jsChat.config.lastMessage.metadata) {
+            chat.jsChat.config.lastMessage.metadata.unread = false
+          }
+          lastMessage = chat.getLastMessage()
+        }
+
+        returnVal.unread = lastMessage && lastMessage.metadata && lastMessage.metadata.unread as boolean
+
       }
       return returnVal
     })}
@@ -164,10 +179,14 @@ export default function Inbox({
 
         if (usernames.length === 1 && !groupChatTitle) {
 
-          chat = await minchat.chat((usernames)[0])
+          chat = await minchat.chat((usernames)[0], { metadata: startConversationMetadata })
         } else {
           //it is a group chat with multiple people
-          chat = await minchat.groupChat({ title: groupChatTitle, memberUsernames: usernames })
+          chat = await minchat.groupChat({
+            title: groupChatTitle,
+            memberUsernames: usernames,
+            metadata: startConversationMetadata
+          })
         }
 
 
