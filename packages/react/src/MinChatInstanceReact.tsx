@@ -65,6 +65,10 @@ class MinChatInstanceReact {
         return this
     }
 
+    getConnectedUser = (): User | undefined => {
+        return this.instance.getConnectedUser()
+    }
+
     async chat(withUsername: string, options?: SingleChatProps): Promise<Chat | null> {
         //check if the chat already exists in the chats json object
         if (this.chats[withUsername]) {

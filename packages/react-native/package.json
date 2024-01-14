@@ -1,5 +1,5 @@
 {
-  "version": "3.0.2",
+  "version": "3.0.3",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -58,6 +58,6 @@
     "typescript": "^4.8.4"
   },
   "dependencies": {
-    "@minchat/react": "^3.0.2"
+    "@minchat/react": "^3.0.3"
   }
 }
