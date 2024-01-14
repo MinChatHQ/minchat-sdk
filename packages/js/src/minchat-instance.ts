@@ -40,7 +40,7 @@ export class MinChatInstance {
 
                 const response = await axios.get((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/chat/list', {
                     headers: {
-                        'Authorization': "Bearer " + this.config.apiKey
+                        'Authorization': "Bearer " + this.config.apiKey,
                     },
                     params
                 })
@@ -67,7 +67,7 @@ export class MinChatInstance {
     onChat(listener: (chat: Chat) => void) {
         this.config.socket?.on('chat', async (data) => {
             if (data.success) {
-                const chat =  transformChat(data, this.config)
+                const chat = transformChat(data, this.config)
                 listener && listener(chat)
             }
         });
@@ -176,7 +176,8 @@ export class MinChatInstance {
 
         const response = await axios.post((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/user', data, {
             headers: {
-                'Authorization': "Bearer " + this.config.apiKey
+                'Authorization': "Bearer " + this.config.apiKey,
+                'Content-Type': 'multipart/form-data',
             },
         })
 

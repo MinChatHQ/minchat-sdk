@@ -5,12 +5,13 @@ import { MinChatUI } from '..';
 import styled from 'styled-components'
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import './index.css'
+import { io } from "socket.io-client"
 
 const devKey = "CLQAJZ09B00007STC893B3TCL"
 const prodKey = ""
 
 
-const apiKey = devKey
+const apiKey = prodKey
 
 const user1 = {
   username: "user11",
@@ -53,6 +54,21 @@ const user7 = {
 const App = () => {
   const [selectedUser, setSelectedUser] = React.useState(user1)
 
+  React.useEffect(() => {
+    const socket = io("https://api.minchat.io", { transports: ['websocket'] });
+
+    socket.emit('room.user.join', { channelUserId: "clrdntfdp0001k9e1jubalkok", apiKey: apiKey })
+
+    socket.emit('room.join', { channelId: "clrdnttr30005k9e1mcs7cf2y", apiKey: apiKey })
+
+    socket.on('typing.start', (userData) => {
+      console.log({started: userData})
+     })
+     socket.on('typing.stop', (userData) => {
+      console.log({stopped: userData})
+     })
+
+  }, [])
 
   return (
     <BrowserRouter>
@@ -66,7 +82,7 @@ const App = () => {
             }}>Change to user 2</button>
             <MinChatUI
               demo={true}
-              themeColor='red'
+              theme='red'
               test={true}
               user={selectedUser}
               startConversation={async (minchat) => {
@@ -144,7 +160,7 @@ const App = () => {
           <div className='container'>
             <MinChatUI
               // demo={true}
-              test={true}
+              // test={true}
               groupChatTitle='Groupies'
 
               user={user1}
@@ -155,13 +171,13 @@ const App = () => {
             />
 
             <MinChatUI
-              test={true}
+              // test={true}
               // demo={true}
               startConversation={async (minchat) => {
                 const u1 = await minchat.createUser(user1)
                 const u3 = await minchat.createUser(user3)
 
-                return [u1.username, u3.username]
+                return u1.username
               }}
               user={user2}
               apiKey={apiKey}
