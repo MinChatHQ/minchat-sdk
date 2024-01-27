@@ -694,6 +694,67 @@ describe("MinChat Instance", () => {
 
     })
 
+
+
+    it('should delete a user', async () => {
+
+        const createUser = {
+            username: "delete-username",
+            name: "test",
+        }
+
+        const createUser2 = {
+            username: "delete-username2",
+            name: "test",
+        }
+
+        const createUser3 = {
+            username: "delete-username3",
+            name: "test",
+        }
+
+        const minchat = await prepareInstance(createUser)
+        const minchat2 = await prepareInstance(createUser2)
+
+        const user1 = await minchat.createUser(createUser)
+        const user2 = await minchat.createUser(createUser2)
+        const user3 = await minchat.createUser(createUser3)
+
+
+        const chat = await minchat.chat(user2.username)
+        const chat2 = await minchat.groupChat({ memberUsernames: [user2.username, user3.username] })
+        const chatForUser2 = await minchat2.groupChat({ memberUsernames: [user1.username, user3.username] })
+
+        await chat?.sendMessage({ text: "Hello" })
+        await chat2?.sendMessage({ text: "Hello" })
+        await chatForUser2?.sendMessage({ text: "Hello" })
+
+        await minchat.deleteUser(user1.username)
+
+        const conversations = await minchat2.getChats()
+
+        expect(conversations.chats.length).toEqual(1)
+        expect(conversations.totalChats).toEqual(1)
+
+        const messages = await chatForUser2?.getMessages()
+
+        expect(messages?.messages.length).toEqual(1)
+        expect(messages?.totalMessages).toEqual(1)
+
+        const chatsNull = await minchat.getChats()
+        //try to query conversation using a deleted userId
+
+        expect(chatsNull.chats.length).toEqual(0)
+        expect(chatsNull.totalChats).toEqual(0)
+
+        const messagesNull = await chat?.getMessages()
+
+        //try to query messages using a deleted userId
+        expect(messagesNull?.messages.length).toEqual(0)
+        expect(messagesNull?.totalMessages).toEqual(0)
+
+    })
+
     it('should create, update and fetch users', async () => {
         const minchat = await prepareInstance({ username: "hey", name: "Hey" })
         const metadata = { test: "test" }

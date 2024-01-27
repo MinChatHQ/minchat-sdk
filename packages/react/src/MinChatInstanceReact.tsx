@@ -87,6 +87,14 @@ class MinChatInstanceReact {
         }
     }
 
+    async deleteUser(username: string): Promise<Boolean> {
+        return await this.instance.deleteUser(username)
+    }
+
+    async deleteUserById(id: string): Promise<Boolean> {
+        return await this.instance.deleteUserById(id)
+    }
+
     async groupChat(params: GroupChatProps): Promise<Chat | null> {
         //put the id's of the users in the group chat into a string array
         // const ids = params.members.map(member => member.id)

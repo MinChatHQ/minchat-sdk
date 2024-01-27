@@ -108,6 +108,26 @@ export class MinChatInstance {
         return transformUser(response.data.user)
     }
 
+    async deleteUser(username: string): Promise<Boolean> {
+        const user = await this.fetchUser(username)
+        return await this.deleteUserById(user.id)
+    }
+
+    async deleteUserById(id: string): Promise<Boolean> {
+        const response = await axios.delete((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/user/'+id, {
+            headers: {
+                'Authorization': "Bearer " + this.config.apiKey
+            },
+        })
+
+        if (response) {
+            return true
+        } else {
+            return false
+        }
+
+    }
+
     async fetchUserById(id: string): Promise<User> {
         const response = await axios.get((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/user', {
             headers: {
