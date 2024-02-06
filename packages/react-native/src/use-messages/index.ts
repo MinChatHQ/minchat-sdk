@@ -17,10 +17,12 @@ const useMessages = (chat?: Chat, reverse?: boolean) => {
 
     const {
         sendMessage: reactSendMessage,
+        updateMessage: reactUpdateMessage,
         ...rest
     } = useReactUseMessages(chat, reverse)
 
-    const sendMessage = async (message: SendMessage, callback?: ( data: FullMessage) => void) => {
+
+    const prepareFile = async (message: SendMessage) => {
         // let file: AltFile | undefined = undefined
         let file
         if (message.file) {
@@ -42,6 +44,15 @@ const useMessages = (chat?: Chat, reverse?: boolean) => {
             }
         }
 
+        return file
+    }
+    /**
+     * 
+     * @param message 
+     * @param callback 
+     */
+    const sendMessage = async (message: SendMessage, callback?: (data: FullMessage) => void) => {
+        const file = await prepareFile(message)
         //todo create the file 
         reactSendMessage({
             ...message,
@@ -49,9 +60,27 @@ const useMessages = (chat?: Chat, reverse?: boolean) => {
         }, callback)
     }
 
+
+    /**
+     * 
+     * @param messageId 
+     * @param message 
+     * @param callback 
+     */
+    const updateMessage = async (messageId: string, message: SendMessage, callback?: (data: FullMessage) => void) => {
+        const file = await prepareFile(message)
+        //todo create the file 
+        reactUpdateMessage(messageId,
+            {
+                ...message,
+                file
+            }, callback)
+    }
+
     return {
         ...rest,
         sendMessage,
+        updateMessage
     }
 
 }

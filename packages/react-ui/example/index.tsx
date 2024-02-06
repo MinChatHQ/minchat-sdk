@@ -11,7 +11,7 @@ const devKey = "CLQAJZ09B00007STC893B3TCL"
 const prodKey = ""
 
 
-const apiKey = prodKey
+const apiKey = devKey
 
 const user1 = {
   username: "user11",
@@ -81,7 +81,7 @@ const App = () => {
               setSelectedUser(user2)
             }}>Change to user 2</button>
             <MinChatUI
-              demo={true}
+              // demo={true}
               theme='red'
               test={true}
               user={selectedUser}
@@ -99,7 +99,7 @@ const App = () => {
         <Route path="/user-2">
           <MinChatUI
             test={true}
-            demo={true}
+            // demo={true}
             height='400px'
             // startConversation={async (minchat) => {
             //   const userA = await minchat.createUser(user1)
@@ -160,9 +160,9 @@ const App = () => {
           <div className='container'>
             <MinChatUI
               // demo={true}
-              // test={true}
+              test={true}
               groupChatTitle='Groupies'
-
+                
               user={user1}
               apiKey={apiKey}
               renderIsTyping={({ user }) => <div>{user.name} is typing</div>}
@@ -171,7 +171,7 @@ const App = () => {
             />
 
             <MinChatUI
-              // test={true}
+              test={true}
               // demo={true}
               startConversation={async (minchat) => {
                 const u1 = await minchat.createUser(user1)

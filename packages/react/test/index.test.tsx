@@ -893,6 +893,138 @@ describe("MinChat Instance", () => {
             expect(screen.getByText('complete')).toBeInTheDocument();
         }, { timeout: 20_000 });
     }, 30_000)
+
+
+    /**
+    * 
+    */
+    it('should update and delete message', async () => {
+        const user1 = { username: "user1-update-delete", name: "User1" }
+        const user2 = { username: "user2-update-delete", name: "User2" }
+
+
+        /**
+         * USER 1   
+         */
+        const MockComponent1 = () => {
+            const minchat = useMinChat()
+            const { chats } = useChats()
+            const [activeChat, setActiveChat] = React.useState<any>(null)
+
+            let instantiateOnce = false
+
+            useEffect(() => {
+                if (!instantiateOnce && minchat) {
+                    instantiateOnce = true
+
+                    const setupChat = async () => {
+                        const createdUser2 = await minchat.createUser(user2)
+                        const chat = await minchat.chat(createdUser2.username)
+                        setActiveChat(chat)
+                    }
+
+                    setupChat()
+                }
+            }, [chats])
+
+            return <div><ChildComponent1 chat={activeChat} /></div>;
+        };
+
+
+        let messageSent = false
+        let messageUpdated = false
+
+        /**
+         * 
+         */
+        const ChildComponent1 = ({ chat }: any) => {
+            const { messages, sendMessage, updateMessage, deleteMessage } = useMessages(chat)
+            const [complete, setComplete] = useState(false)
+
+            useEffect(() => {
+                async function init() {
+                    if (chat && !messageSent) {
+                        messageSent = true
+                        sendMessage({ text: "Hello" })
+
+
+                        // wait 1 seconds with await
+                        await new Promise((resolve) => {
+                            setTimeout(() => {
+                                resolve(null)
+                            }, 1000)
+                        })
+                        sendMessage({ text: "Hello2" })
+                    }
+                }
+
+                init()
+            }, [chat])
+
+            useEffect(() => {
+                const verify = async () => {
+                    if (messages) {
+                        switch (messages?.length) {
+                            case 0:
+                                break
+                            case 1:
+                                if (messageUpdated) {
+                                    expect(messages.length).toEqual(1)
+                                    expect(messages[0].text).toEqual("Updated")
+                                    setComplete(true)
+                                }
+                                break
+                            case 2:
+                                //update the first message
+                                if (!messages[0].loading) {
+                                    if (!messageUpdated) {
+                                        messageUpdated = true
+
+                                        // wait 1 seconds with await
+                                        await new Promise((resolve) => {
+                                            setTimeout(() => {
+                                                resolve(null)
+                                            }, 2000)
+                                        })
+
+                                        updateMessage(messages[0].id || "", { text: "Updated" })
+                                    } else {
+                                        if (messages[0].text === "Updated") {
+                                            // only delete message if updated message
+                                            deleteMessage(messages[1].id || "")
+                                        }
+                                    }
+                                }
+                                break
+                            default:
+                                console.log({ messages })
+                                throw Error()
+                        }
+                    }
+                }
+
+                verify()
+
+            }, [messages])
+
+            return <div>{complete && "complete"}</div>;
+        };
+
+
+
+        render(
+            <MinChatProvider
+                test
+                apiKey={apiKey}
+                user={user1}>
+                <MockComponent1 />
+            </MinChatProvider>
+        );
+
+        await waitFor(() => {
+            expect(screen.getByText('complete')).toBeInTheDocument();
+        }, { timeout: 25_000 });
+    }, 30_000)
 })
 
 

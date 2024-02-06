@@ -451,6 +451,7 @@ describe("MinChat Instance", () => {
     })
 
 
+
     it("should show user is active and update last seen", (done) => {
         async function runTest() {
             let user1: any = { username: "user1-active", name: "User1" }
@@ -503,6 +504,7 @@ describe("MinChat Instance", () => {
 
         runTest()
     }, 30_000)
+
     // it('bug fix test: should not have duplicate chats last message', (done) => {
     //     async function runTest() {
     //         const user1 = { username: "user1-duplicate-message", name: "User1" }
@@ -801,6 +803,248 @@ describe("MinChat Instance", () => {
 
         return await instance.connectUser(user)
     }
+
+
+
+    it("should recieve message seen if request made through API", (done) => {
+        async function runTest() {
+            const user1 = { username: "user1-seen-api", name: "User1" }
+            const user2 = { username: "user2-seen-api", name: "User2" }
+
+            const instance1 = await prepareInstance(user1)
+            const instance2 = await prepareInstance(user2)
+
+            let sentMessageId: string | undefined = ""
+
+            const chat1 = await instance1.chat(instance2.config.user?.username || "")
+
+            chat1?.sendMessage({ text: "Hello" }, async () => {
+
+                const { chats } = await instance2.getChats()
+
+                const chat2 = chats[0]
+
+
+                chat2?.onMessageSeen(async (messageId) => {
+                    expect(messageId).toBe(sentMessageId)
+                    const { messages } = await chat2.getMessages()
+                    expect(messages[1].seen).toBe(true)
+                    done()
+                })
+
+
+                chat2.sendMessage({ text: "Hey" }, async (data) => {
+                    sentMessageId = data.id
+                    // wait 2 seconds with await
+                    await new Promise((resolve) => {
+                        setTimeout(() => {
+                            resolve(null)
+                        }, 2000)
+                    })
+
+                    await getAxios().post(LOCALHOST_PATH + `/v1/messages/${sentMessageId}/seen`, {
+                        user_id: instance1.getConnectedUser()?.id
+                    }, {
+                        headers: {
+                            "Authorization": "Bearer " + apiKey,
+                        }
+                    })
+                    // chat1.setSeen(sentMessageId)
+                })
+            })
+        }
+
+        runTest()
+    })
+
+    /**
+ * 
+ */
+    it('should recieve message if message sent through API', (done) => {
+        async function runTest() {
+
+            const user1 = { username: "user1-title-api", name: "User1" }
+            const user2 = { username: "user2-title-api", name: "User2" }
+
+            const instance1 = await prepareInstance(user1)
+            const instance2 = await prepareInstance(user2)
+
+
+
+
+            const chat1 = await instance1.chat(instance2.config.user?.username || "")
+
+            let doneCounter = 0
+            function checkDone() {
+                doneCounter++
+                if (doneCounter >= 2) {
+                    done()
+                }
+            }
+            chat1?.onMessage((message) => {
+                expect(message.text).toEqual("Hello")
+                expect(message.createdAt).toBeDefined()
+                expect(message?.createdAt instanceof Date).toEqual(true)
+                expect(message.user.id).toEqual(instance2.config.user?.id)
+                expect(message.user.username).toEqual(instance2.config.user?.username)
+                checkDone()
+            })
+
+            instance1.onChat((chat) => {
+                expect(chat.getTitle()).toEqual(user2.name)
+                expect(chat.getLastMessage()?.text).toEqual("Hello")
+                expect(chat.getLastMessage()?.user.id).toEqual(instance2.config.user?.id)
+                expect(chat.getLastMessage()?.user.username).toEqual(instance2.config.user?.username)
+                expect(chat.getLastMessage()?.createdAt).toBeDefined()
+                expect(chat.getLastMessage()?.createdAt instanceof Date).toEqual(true)
+                checkDone()
+            })
+
+
+            //   chat 2 sends a message using API
+            const data = new FormData()
+            data.append("chat_id", chat1?.getId() as string)
+            data.append("user_id", instance2.getConnectedUser()?.id as string)
+            data.append("text", "Hello")
+
+            await getAxios().post(LOCALHOST_PATH + "/v1/messages", data, {
+                headers: {
+                    "Authorization": "Bearer " + apiKey,
+                    'Content-Type': 'multipart/form-data',
+
+                }
+            })
+        }
+
+        runTest()
+
+    }, 20_000)
+
+
+
+    /**
+ * 
+ */
+    it('should update message if message sent through API and SDK', (done) => {
+        async function runTest() {
+
+            const user1 = { username: "user1-update-api", name: "User1" }
+            const user2 = { username: "user2-update-api", name: "User2" }
+
+            const instance1 = await prepareInstance(user1)
+            const instance2 = await prepareInstance(user2)
+
+            const chat1 = await instance1.chat(instance2.config.user?.username || "")
+            const chat2 = await instance2.chat(instance1.config.user?.username || "")
+
+            let doneCounter = 0
+            function checkDone() {
+                doneCounter++
+                if (doneCounter >= 2) {
+                    done()
+                }
+            }
+
+            chat1?.onMessageUpdated((message) => {
+                if (doneCounter === 0) {
+                    expect(message.text).toEqual("Updated")
+                } else if (doneCounter === 1) {
+                    expect(message.text).toEqual("Updated 2")
+                }
+                expect(message.createdAt).toBeDefined()
+                expect(message?.createdAt instanceof Date).toEqual(true)
+                expect(message.user.id).toEqual(instance2.config.user?.id)
+                expect(message.user.username).toEqual(instance2.config.user?.username)
+                checkDone()
+            })
+
+
+            chat2?.sendMessage({ text: "Hello" }, async (message) => {
+                //update the message
+                const data = new FormData()
+                data.append("text", "Updated")
+
+                //update message using api
+                await getAxios().patch(LOCALHOST_PATH + `/v1/messages/${message.id}`, data, {
+                    headers: {
+                        "Authorization": "Bearer " + apiKey,
+                        'Content-Type': 'multipart/form-data',
+
+                    }
+                })
+
+
+                //update using sdk
+                chat2.updateMessage(message?.id || "", { text: "Updated 2" })
+            })
+        }
+
+        runTest()
+
+    }, 20_000)
+
+
+
+    /**
+ * 
+ */
+    it('should delete message if message sent through API and SDK', (done) => {
+        async function runTest() {
+
+            const user1 = { username: "user1-delete-api", name: "User1" }
+            const user2 = { username: "user2-delete-api", name: "User2" }
+
+            const instance1 = await prepareInstance(user1)
+            const instance2 = await prepareInstance(user2)
+
+            const chat1 = await instance1.chat(instance2.config.user?.username || "")
+            const chat2 = await instance2.chat(instance1.config.user?.username || "")
+
+            let doneCounter = 0
+            function checkDone() {
+                doneCounter++
+                if (doneCounter >= 2) {
+                    done()
+                }
+            }
+
+            let message1Id: string = ""
+            let message2Id: string = ""
+
+            chat1?.onMessageDeleted((messageId) => {
+                if (doneCounter === 0) {
+                    expect(messageId).toEqual(message1Id)
+                } else if (doneCounter === 1) {
+                    expect(messageId).toEqual(message2Id)
+                }
+                checkDone()
+            })
+
+
+            chat2?.sendMessage({ text: "msg1" }, (message) => message1Id = message.id || "")
+            chat2?.sendMessage({ text: "msg2" }, (message) => message2Id = message.id || "")
+            chat2?.sendMessage({ text: "msg3" })
+
+            // wait 3 seconds with to allow the messages to send
+            await new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(null)
+                }, 3000)
+            })
+
+            //delete messages
+            await getAxios().delete(LOCALHOST_PATH + `/v1/messages/${message1Id}`, {
+                headers: {
+                    "Authorization": "Bearer " + apiKey
+                }
+            })
+
+            chat2?.deleteMessage(message2Id)
+        }
+
+        runTest()
+
+    }, 20_000)
 })
 
 

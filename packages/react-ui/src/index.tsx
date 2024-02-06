@@ -111,7 +111,10 @@ export interface Props extends RenderProps {
   mobileView?: boolean
   theme?: string
   colorSet?: {}
-  showAttach?: boolean
+  showAttachButton?: boolean
+  showSendButton?: boolean
+  disableInput?: boolean
+
 }
 
 export {

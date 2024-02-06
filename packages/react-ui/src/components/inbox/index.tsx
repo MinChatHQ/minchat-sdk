@@ -28,7 +28,9 @@ interface Props extends RenderProps {
   startConversationMetadata?: Record<string, string | number | boolean>
   groupChatTitle?: string
   mobileView?: boolean
-  showAttach?: boolean
+  showAttachButton?: boolean
+  showSendButton?: boolean
+  disableInput?: boolean
   demo: boolean
 }
 
@@ -46,7 +48,9 @@ export default function Inbox({
   startConversationMetadata,
   groupChatTitle,
   mobileView,
-  showAttach = true,
+  showAttachButton = true,
+  showSendButton = true,
+  disableInput = false,
   demo,
   // render props
   renderEmptyMessages = () => undefined,
@@ -133,7 +137,9 @@ export default function Inbox({
   renderInput = ({ sendMessage, sendFile, inputProps, isMobile }) => <MessageInput
     mobileView={isMobile}
     {...inputProps}
-    showAttachButton={showAttach}
+    showAttachButton={showAttachButton}
+    showSendButton={showSendButton}
+    disabled={disableInput}
     onAttachClick={sendFile}
     onSendMessage={sendMessage} />,
 

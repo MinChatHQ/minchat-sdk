@@ -1745,20 +1745,20 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
-"@minchat/js@^3.1.0":
-  version "3.1.0"
-  resolved "https://registry.npmjs.org/@minchat/js/-/js-3.1.0.tgz"
-  integrity sha512-qdq2Hl7G9689NQbCQWUlWrnFBeXKgN46o437py8L0t5ZQhD7JWksHMy5tWb7MvYsLrfuXCb1sF8ltuk9oZBHFQ==
+"@minchat/js@^3.2.0":
+  version "3.2.0"
+  resolved "https://registry.npmjs.org/@minchat/js/-/js-3.2.0.tgz"
+  integrity sha512-zX0jl60Qbsqa76XThjQABeVJRnvQ61HoL62NpJ2fLNfBPjpGKi7iJjEdj5IUyiNkBb8Di/D7UVwHXkl31NwZGw==
   dependencies:
     axios "^0.27.2"
     socket.io-client "^4.7.2"
 
-"@minchat/react@^3.1.0":
-  version "3.1.0"
-  resolved "https://registry.npmjs.org/@minchat/react/-/react-3.1.0.tgz"
-  integrity sha512-pbt3xTGs1ucY5ggmQjqZDsdYexwUcd27Fsiz6uHN4TFa+E/i+g56PGEJjDW9WuH0msIRvQ1NcjUNLM5lbx2PaA==
+"@minchat/react@^3.2.0":
+  version "3.2.0"
+  resolved "https://registry.npmjs.org/@minchat/react/-/react-3.2.0.tgz"
+  integrity sha512-lZ1bXTI1JUJcnKSq/wn6fs/aUEpLYn93C+u/ZJNfytachHLWDBwoU33CFlNavnA96JUiAwl+Qf89TWaToGoTsQ==
   dependencies:
-    "@minchat/js" "^3.1.0"
+    "@minchat/js" "^3.2.0"
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"

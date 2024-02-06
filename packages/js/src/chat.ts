@@ -149,6 +149,44 @@ class Chat {
     }
 
     /**
+     * delete a message in the conversation
+     * @param messageId 
+     */
+    async deleteMessage(messageId: string) {
+        //emit the message to the socket server
+        this.mainConfig?.socket?.emit('message.delete', {
+            apiKey: this.mainConfig.apiKey,
+            messageId
+        })
+    }
+
+    /**
+     * 
+     * @param param0 
+     * @param callback - callback function to know the status of the message being sent whether it was successful or there was an error
+     */
+    async updateMessage(messageId: string, sendMessageData: SendMessage, callback?: (data: FullMessage) => void) {
+
+        await this.mainConfig.waitForInstanceReady()
+
+        let processedFile = prepareFileForUpload(sendMessageData.file)
+
+        //emit the message to the socket server
+        this.mainConfig?.socket?.emit('message.update', {
+            text: sendMessageData.text,
+            file: processedFile?.file,
+            metadata: sendMessageData.metadata,
+            apiKey: this.mainConfig.apiKey,
+            messageId
+        },
+            (response: any) => {
+                const transformedMessage = transformMessage(response)
+                //pass on to the callback if it is defined
+                callback && transformedMessage && callback(transformedMessage)
+            });
+    }
+
+    /**
      * 
      * @param param0 
      * @param callback - callback function to know the status of the message being sent whether it was successful or there was an error
@@ -240,7 +278,24 @@ class Chat {
                 listener && transformedMessage && listener(transformedMessage)
             }
         });
+    }
 
+    onMessageUpdated(listener: (data: FullMessage) => void) {
+        this.joinRoom()
+        this.mainConfig?.socket?.on('message.update', (data: any) => {
+            if (data.success) {
+                const transformedMessage = transformMessage(data)
+                listener && transformedMessage && listener(transformedMessage)
+            }
+        });
+    }
+
+    onMessageDeleted(listener: (messageId: string) => void) {
+
+        this.joinRoom()
+        this.mainConfig?.socket?.on('message.delete', (data: any) => {
+            listener && listener(data)
+        });
     }
 
     /**
@@ -269,16 +324,6 @@ class Chat {
             listener && listener(data)
         });
     }
-
-    // // handle user who just entered the chat
-    // onUserLeft(callback: { callback: (user: User) => void }) {
-
-    // }
-
-    // // handle user who just left the chat
-    // onUserEntered(callback: { callback: (user: User) => void }) {
-
-    // }
 
     async startTyping() {
         await this.mainConfig.waitForInstanceReady()
@@ -353,7 +398,7 @@ class Chat {
 
     onError(listener: (data: any) => void) {
         this.mainConfig?.socket?.on('error', (data: any) => {
-            listener && listener(data.message)
+            listener && listener(data?.message)
         });
     }
 

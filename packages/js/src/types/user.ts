@@ -3,8 +3,10 @@ export type User = {
     username: string
     name: string
     avatar?: string
-    createdAt: Date
     lastActive: Date
     metadata?: Record<string, string | number | boolean>
+
+    createdAt: Date
+    updatedAt?: Date
 }
 
