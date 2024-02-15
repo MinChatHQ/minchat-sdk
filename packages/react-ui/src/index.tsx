@@ -114,7 +114,7 @@ export interface Props extends RenderProps {
   showAttachButton?: boolean
   showSendButton?: boolean
   disableInput?: boolean
-
+  openChatId?: string
 }
 
 export {

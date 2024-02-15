@@ -32,6 +32,7 @@ interface Props extends RenderProps {
   showSendButton?: boolean
   disableInput?: boolean
   demo: boolean
+  openChatId?: string
 }
 
 interface ContainerProps {
@@ -52,6 +53,7 @@ export default function Inbox({
   showSendButton = true,
   disableInput = false,
   demo,
+  openChatId,
   // render props
   renderEmptyMessages = () => undefined,
   renderEmptyChats = () => undefined,
@@ -205,14 +207,26 @@ export default function Inbox({
   }, [startConversation, minchat])
 
   useEffect(() => {
-    if (chats && !selectedChat && chatsOrdered > 0) {
-      if (chats.length > 0 && !isMobile && !mobileView && !startConversation) {
-        //using this method because if I use chats[0] it isnt selecting the correct first item
-        const chat = chats.slice(0, 1)[0];
-        setSelectedChat(chat)
+    if (chats) {
+      if (openChatId) {
+        for (const chat of chats) {
+          const chatId = chat.getId()
+          if (chatId && (chatId.toLowerCase() === openChatId.toLowerCase())) {
+            setSelectedChat(chat)
+            break
+          }
+        }
+      } else {
+        if (!selectedChat && chatsOrdered > 0) {
+          if (chats.length > 0 && !isMobile && !mobileView && !startConversation) {
+            //using this method because if I use chats[0] it isnt selecting the correct first item
+            const chat = chats.slice(0, 1)[0];
+            setSelectedChat(chat)
+          }
+        }
       }
     }
-  }, [chats, chatsOrdered])
+  }, [chats, chatsOrdered, openChatId])
 
   let lastActiveIntervalId: any
 

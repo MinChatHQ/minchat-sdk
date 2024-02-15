@@ -302,6 +302,66 @@ describe("MinChat Instance", () => {
 
     // })
 
+
+    it('should add and remove participants from a chat', (done) => {
+        async function runTest() {
+            const instance = await prepareInstance({ name: "user1", username: "user1-add-participant" })
+            const user1 = instance.getConnectedUser()
+            const user2 = await instance.createUser({ name: "user2", username: "user2-add-participant" })
+            const user3 = await instance.createUser({ name: "user3", username: "user3-add-participant" })
+            const user4 = await instance.createUser({ name: "user4", username: "user4-add-participant" })
+
+
+            const chat = await instance.groupChat({ memberUsernames: [user2.username] })
+
+            chat?.sendMessage({ text: "Hello" }, async () => {
+                await chat?.removeMember(user1?.username || "")
+                let memberIds = chat.getMemberIds()
+                expect(memberIds.includes(user1?.id || "")).toEqual(false)
+
+                try {
+                    await chat.removeMember(user1?.username || '')
+
+                } catch (e) {
+                    throw Error()
+                }
+
+                memberIds = chat.getMemberIds()
+                expect(memberIds).toEqual(memberIds)
+
+                let members = chat.getMembers()
+                expect(members.sort()).toEqual([user2].sort())
+                await chat.addMemberById(user3.id)
+                await chat.addMember(user4.username)
+                await chat.addMember(user2.username)
+                await chat.addMember(user1?.username || "")
+
+                //dont add an already existing particpant
+                await chat.addMember(user2.username)
+
+                memberIds = chat.getMemberIds()
+                members = chat.getMembers()
+
+                expect(memberIds).toEqual([user2.id, user3.id, user4.id].sort())
+                expect(members).toEqual([user2, user3, user4].sort())
+
+                await chat.removeMemberById(user4.id)
+
+                memberIds = chat.getMemberIds()
+                members = chat.getMembers()
+
+                expect(memberIds).toEqual([user2.id, user3.id].sort())
+                expect(members).toEqual([user2, user3].sort())
+
+                done()
+
+            })
+
+        }
+
+        runTest()
+    });
+
     it("should get demo chats and messages", async () => {
         const instance = MinChat.getInstance("1")
         instance.init({ test: true, demo: true })

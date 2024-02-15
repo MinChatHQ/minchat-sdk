@@ -1745,20 +1745,20 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
-"@minchat/js@^3.2.0":
-  version "3.2.0"
-  resolved "https://registry.npmjs.org/@minchat/js/-/js-3.2.0.tgz"
-  integrity sha512-zX0jl60Qbsqa76XThjQABeVJRnvQ61HoL62NpJ2fLNfBPjpGKi7iJjEdj5IUyiNkBb8Di/D7UVwHXkl31NwZGw==
+"@minchat/js@^3.3.0":
+  version "3.3.0"
+  resolved "https://registry.npmjs.org/@minchat/js/-/js-3.3.0.tgz"
+  integrity sha512-jRc5n734IEo9/w32ld25RfDOVF1tjsbGHWLVDs60T7gwvpGPUOPQjs2yvokWXvwKSV+VUeFDds4CEmKxMMnW6A==
   dependencies:
     axios "^0.27.2"
     socket.io-client "^4.7.2"
 
-"@minchat/react@^3.2.0":
-  version "3.2.0"
-  resolved "https://registry.npmjs.org/@minchat/react/-/react-3.2.0.tgz"
-  integrity sha512-lZ1bXTI1JUJcnKSq/wn6fs/aUEpLYn93C+u/ZJNfytachHLWDBwoU33CFlNavnA96JUiAwl+Qf89TWaToGoTsQ==
+"@minchat/react@^3.3.0":
+  version "3.3.0"
+  resolved "https://registry.npmjs.org/@minchat/react/-/react-3.3.0.tgz"
+  integrity sha512-AQdpuJoMz68qyhXolomtQNxLl38kYLgDbuCBRTTGAduphDf+RMzq3JXr5Vmaq5Pr4g8dWwmAcv5zcnyQRnYIUA==
   dependencies:
-    "@minchat/js" "^3.2.0"
+    "@minchat/js" "^3.3.0"
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
@@ -4018,9 +4018,9 @@ engine.io-client@~6.5.2:
     xmlhttprequest-ssl "~2.0.0"
 
 engine.io-parser@~5.2.1:
-  version "5.2.1"
-  resolved "https://registry.npmjs.org/engine.io-parser/-/engine.io-parser-5.2.1.tgz"
-  integrity sha512-9JktcM3u18nU9N2Lz3bWeBgxVgOKpw7yhRaoxQA3FUDZzzw+9WlA6p4G4u0RixNkg14fH7EfEc/RhpurtiROTQ==
+  version "5.2.2"
+  resolved "https://registry.npmjs.org/engine.io-parser/-/engine.io-parser-5.2.2.tgz"
+  integrity sha512-RcyUFKA93/CXH20l4SoVvzZfrSDMOTUS3bWVpTt2FuFP+XYrL8i8oonHP7WInRyVHXh0n/ORtoeiE1os+8qkSw==
 
 enquirer@^2.3.4:
   version "2.3.6"

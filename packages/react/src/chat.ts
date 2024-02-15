@@ -70,6 +70,22 @@ class Chat {
     setSeen(messageId?: string | null) {
         return this.jsChat.setSeen(messageId)
     }
+
+    async removeMemberById(userId: string) {
+        return this.jsChat.removeMemberById(userId)
+    }
+
+    async removeMember(username: string) {
+        return this.jsChat.removeMember(username)
+    }
+
+    async addMember(username: string) {
+        return this.jsChat.addMember(username)
+    }
+
+    async addMemberById(userId: string) {
+        return this.jsChat.addMemberById(userId)
+    }
 }
 
 export default Chat

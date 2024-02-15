@@ -62,11 +62,11 @@ const App = () => {
     socket.emit('room.join', { channelId: "clrdnttr30005k9e1mcs7cf2y", apiKey: apiKey })
 
     socket.on('typing.start', (userData) => {
-      console.log({started: userData})
-     })
-     socket.on('typing.stop', (userData) => {
-      console.log({stopped: userData})
-     })
+      console.log({ started: userData })
+    })
+    socket.on('typing.stop', (userData) => {
+      console.log({ stopped: userData })
+    })
 
   }, [])
 
@@ -161,8 +161,9 @@ const App = () => {
             <MinChatUI
               // demo={true}
               test={true}
+              openChatId='clqdhzd6f000ltcdofbp5vedo'
               groupChatTitle='Groupies'
-                
+
               user={user1}
               apiKey={apiKey}
               renderIsTyping={({ user }) => <div>{user.name} is typing</div>}

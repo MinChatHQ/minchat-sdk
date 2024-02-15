@@ -3,7 +3,7 @@ import axios from "axios"
 import Config from "./configs/config";
 import { User } from "./types/user";
 import { SendMessage } from "./types/send-message";
-import { transformMessage, transformMessagesResponse } from "./transformers";
+import { transformMessage, transformMessagesResponse, transformUser } from "./transformers";
 import { FullMessage } from "./types/full-message";
 import { MessagesResponse } from "./types/messages-response";
 import { prepareFileForUpload } from "./utils/file-utils";
@@ -28,7 +28,6 @@ class Chat {
 
             try {
 
-                //todo dynamically switch url between development and production
                 const response = await axios.patch((this.mainConfig.test ? this.mainConfig.localhostPath : this.mainConfig.productionPath) + '/v1/chat/' + this.config.channelId, {
                     metadata
                 },
@@ -69,6 +68,106 @@ class Chat {
 
     getChatAvatar() {
         return this.config.avatar
+    }
+
+    async addMember(username: string) {
+        if (this.config.channelId) {
+            try {
+                const response = await axios.get((this.mainConfig.test ? this.mainConfig.localhostPath : this.mainConfig.productionPath) + '/v1/user', {
+                    headers: {
+                        'Authorization': "Bearer " + this.mainConfig.apiKey
+                    },
+                    params: {
+                        username
+                    }
+                })
+
+                await this.addMemberById(response.data.user.id)
+
+            } catch (e) {
+                console.log(e)
+            }
+        }
+    }
+
+
+    async addMemberById(userId: string) {
+        if (this.config.channelId) {
+
+            try {
+
+                const response = await axios.post((this.mainConfig.test ? this.mainConfig.localhostPath : this.mainConfig.productionPath) + '/v1/chat/' + this.config.channelId + '/participants', {
+                    user_id: userId
+                },
+                    {
+                        headers: {
+                            Authorization: "Bearer " + this.mainConfig.apiKey
+                        },
+                    })
+
+                // update the members
+                if (response.data.success) {
+                    const user = transformUser(response.data.participant)
+                    //dont add member if its the connected user
+                    if (this.mainConfig.user?.id !== user.id) {
+                        let isAlreadyMember = false
+                        this.config.members.forEach(member => {
+                            if (member.id === user.id) isAlreadyMember = true
+                        })
+
+                        if (!isAlreadyMember) this.config.members.push(user)
+
+                        if (!this.config.memberIds.includes(user.id)) this.config.memberIds.push(user.id)
+                    }
+                }
+
+            } catch (e) {
+                console.log(e)
+            }
+
+        }
+    }
+
+    async removeMember(username: string) {
+        const response = await axios.get((this.mainConfig.test ? this.mainConfig.localhostPath : this.mainConfig.productionPath) + '/v1/user', {
+            headers: {
+                'Authorization': "Bearer " + this.mainConfig.apiKey
+            },
+            params: {
+                username
+            }
+        })
+
+        await this.removeMemberById(response.data.user.id)
+    }
+
+    async removeMemberById(userId: string) {
+        if (this.config.channelId) {
+
+            try {
+
+                const response = await axios.delete((this.mainConfig.test ? this.mainConfig.localhostPath : this.mainConfig.productionPath) + '/v1/chat/' + this.config.channelId + '/participants/' + userId,
+                    {
+                        headers: {
+                            Authorization: "Bearer " + this.mainConfig.apiKey
+                        },
+                    })
+
+
+                // update the members
+                if (response.data.success) {
+                    const user = transformUser(response.data.participant)
+
+                    this.config.members = this.config.members.filter(member => member.id !== user.id)
+                    this.config.memberIds = this.config.memberIds.filter(id => id !== user.id)
+
+                }
+
+            } catch (e) {
+                console.log(e)
+            }
+
+        }
     }
 
     getMembers(): User[] {
