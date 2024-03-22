@@ -5,6 +5,7 @@ import { Chat, MinChatProvider, useChats, useMessages, useMinChat } from "../src
 import axios from "axios";
 import '@testing-library/jest-dom';
 
+
 describe("MinChat Instance", () => {
     let userId: string
     let apiKey: string
@@ -1006,6 +1007,108 @@ describe("MinChat Instance", () => {
                 verify()
 
             }, [messages])
+
+            return <div>{complete && "complete"}</div>;
+        };
+
+
+
+        render(
+            <MinChatProvider
+                test
+                apiKey={apiKey}
+                user={user1}>
+                <MockComponent1 />
+            </MinChatProvider>
+        );
+
+        await waitFor(() => {
+            expect(screen.getByText('complete')).toBeInTheDocument();
+        }, { timeout: 25_000 });
+    }, 30_000)
+
+
+
+    /**
+    * 
+    */
+    it('should delete chat', async () => {
+        const user1 = { username: "user1-delete-chat", name: "User1" }
+        const user2 = { username: "user2-delete-chat", name: "User2" }
+        const user3 = { username: "user3-delete-chat", name: "User2" }
+
+
+        /**
+         * USER 1   
+         */
+        const MockComponent1 = () => {
+            const [noneDeletedChatId, setNoneDeletedChatId] = useState<string | undefined>(undefined)
+            const minchat = useMinChat()
+            const { chats } = useChats()
+            const [activeChat, setActiveChat] = React.useState<any>(null)
+            const [deletedChatState, setDeletedChatState] = React.useState<boolean>(false)
+
+            let instantiateOnce = false
+            let deletedChat = false
+
+            useEffect(() => {
+                if (!instantiateOnce && minchat) {
+                    instantiateOnce = true
+
+                    const setupChat = async () => {
+                        await minchat.connectUser(user1)
+
+                        const createdUser2 = await minchat.createUser(user2)
+                        const createdUser3 = await minchat.createUser(user3)
+
+                        const chat1 = await minchat.groupChat({ memberUsernames: [createdUser2.username, createdUser3.username] })
+                        const chat2 = await minchat.groupChat({ memberUsernames: [createdUser2.username, createdUser3.username] })
+                        setNoneDeletedChatId(chat2?.getId())
+
+                        chat1?.jsChat.sendMessage({ text: "Hello" })
+                        chat2?.jsChat.sendMessage({ text: "Hello" })
+
+                        setActiveChat(chat1)
+
+                        deletedChat = true
+                        await minchat.deleteChat(chat1?.getId() || "")
+                        setDeletedChatState(true)
+                    }
+
+                    setupChat()
+                } else {
+                    if (chats && chats.length === 1) {
+                        if (deletedChat) {
+                            expect(chats[0].getId()).toEqual(noneDeletedChatId)
+                        }
+                    }
+                }
+            }, [minchat, chats])
+
+            return <div><ChildComponent1
+                deletedChatState={deletedChatState}
+                chat={activeChat} /></div>;
+        };
+
+
+
+        /**
+         * 
+         */
+        const ChildComponent1 = ({
+            chat,
+            deletedChatState
+        }: any) => {
+
+            const { messages } = useMessages(chat)
+            const [complete, setComplete] = useState(false)
+
+            useEffect(() => {
+                if (deletedChatState) {
+                    expect(messages?.length).toEqual(0)
+                    setComplete(true)
+                }
+            }, [deletedChatState])
 
             return <div>{complete && "complete"}</div>;
         };

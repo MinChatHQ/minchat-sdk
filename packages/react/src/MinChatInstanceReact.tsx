@@ -126,6 +126,17 @@ class MinChatInstanceReact {
         return chat
         // }
     }
+
+    /**
+     * 
+     * @param chatId 
+     */
+    async deleteChat(chatId: string): Promise<boolean> {
+        chatId
+        return false
+        // return await this.instance.deleteChat(chatId)
+    }
+
 }
 
 export default MinChatInstanceReact

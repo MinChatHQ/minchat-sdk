@@ -114,7 +114,7 @@ export class MinChatInstance {
     }
 
     async deleteUserById(id: string): Promise<Boolean> {
-        const response = await axios.delete((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/user/'+id, {
+        const response = await axios.delete((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/user/' + id, {
             headers: {
                 'Authorization': "Bearer " + this.config.apiKey
             },
@@ -338,6 +338,20 @@ export class MinChatInstance {
             return chat
         } else {
             return undefined
+        }
+    }
+
+    async deleteChat(chatId: string): Promise<boolean> {
+        try {
+            const response = await axios.delete((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/chat/' + chatId, {
+                headers: {
+                    'Authorization': "Bearer " + this.config.apiKey
+                },
+            });
+
+            return response.data.success
+        } catch (e) {
+            return false
         }
     }
 }

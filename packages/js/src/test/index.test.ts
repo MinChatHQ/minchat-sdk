@@ -1105,6 +1105,42 @@ describe("MinChat Instance", () => {
         runTest()
 
     }, 20_000)
+
+    it('should delete a chat', (done) => {
+
+        const runTest = async () => {
+            const user1 = { username: "delete-chat", name: "User1" }
+            const instance1 = await prepareInstance(user1)
+            const user2 = await instance1.createUser({ username: "delete-chat-2", name: "User2" })
+            const user3 = await instance1.createUser({ username: "delete-chat-3", name: "User3" })
+
+            const chat1 = await instance1.groupChat({ memberUsernames: [user2.username, user3.username], title: "Group Chat 1" })
+            const chat2 = await instance1.groupChat({ memberUsernames: [user2.username, user3.username], title: "Group Chat 2" })
+
+            await chat1?.sendMessage({ text: "Hey" })
+            await chat2?.sendMessage({ text: "Hey 2" })
+
+            let success = await instance1.deleteChat(chat1?.getId() || "")
+            expect(success).toEqual(true)
+            success = await instance1.deleteChat(chat1?.getId() || "")
+            expect(success).toEqual(false)
+
+            const chats = await instance1.getChats()
+            expect(chats.chats.length).toEqual(1)
+            expect(chats.totalChats).toEqual(1)
+            expect(chats.chats[0].getId()).toEqual(chat2?.getId())
+
+            const deletedMessages = await chat1?.getMessages()
+
+            expect(deletedMessages?.messages.length).toEqual(0)
+            expect(deletedMessages?.totalMessages).toEqual(0)
+            expect(deletedMessages?.success).toEqual(false)
+          
+            done()
+        }
+
+        runTest()
+    })
 })
 
 

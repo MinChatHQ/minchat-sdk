@@ -231,7 +231,7 @@ class Chat {
 
                 return messagesResponse
             } catch (e) {
-                console.log(e)
+                // console.log(e)
             }
 
         }
