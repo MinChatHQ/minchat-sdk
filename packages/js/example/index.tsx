@@ -5,7 +5,10 @@ import MinChat, { } from '../.';
 import { MinChatInstance } from '../dist/minchat-instance';
 
 
-const apiKey = ""
+const testApiKey = "cm3q5j3bn0000dp2k7yukhbwk"
+const prodAPiKey = ""
+
+const apiKey = prodAPiKey
 
 /**
  * 
@@ -16,8 +19,8 @@ const App = () => {
 
   React.useEffect(() => {
     const setup = async () => {
-      const instance = MinChat.getInstance(apiKey).init({ test: true })
-      await instance.connectUser({ username: "fred", name: "Fred" })
+      const instance = MinChat.getInstance(apiKey).init({ test: false })
+      await instance.connectUser({ username: "fredrick", name: "Fred" })
       setMinChatInstance(instance)
     }
 
@@ -40,12 +43,9 @@ const ChildComponent = ({ instance }: { instance: MinChatInstance }) => {
   const [messageFile, setMessageFile] = React.useState<any>();
 
 
-
-
-
   const createUser = async () => {
     const createdUser = await instance.createUser({
-      username: "test",
+      username: "the_user",
       name: "Test",
       avatar: selectedFile
     })
@@ -55,11 +55,16 @@ const ChildComponent = ({ instance }: { instance: MinChatInstance }) => {
       avatar: selectedChatFile
     })
 
-    console.log({ chatAvatar: groupChat?.getChatAvatar() })
 
     groupChat?.sendMessage({
       file: messageFile
     }, (message) => console.log({ message }))
+
+    console.log({ groupChat })
+
+    const { chats } = await instance.getChats()
+    console.log({ chats })
+
   }
 
   return <div >
@@ -93,4 +98,43 @@ const ChildComponent = ({ instance }: { instance: MinChatInstance }) => {
   </div>
 }
 
-ReactDOM.render(<App />, document.getElementById('root'));
+const Test = () => {
+  const [chats, setChats] = React.useState<any[]>()
+
+  React.useEffect(() => {
+    const init = async () => {
+      const currentUser = {
+        username: "micheal",
+        name: "Micheal Saunders",
+      }
+
+      const minchat = MinChat.getInstance(apiKey)
+      await minchat.connectUser(currentUser)
+
+      const otherUser = await minchat.createUser({
+        username: "example-jackal",
+        name: "Example Name",
+      })
+
+      //Open chat with otherUser
+      const openedChatConnection = await minchat.chat(otherUser.username);
+      //Send message to other user
+      openedChatConnection?.sendMessage({ text: "Hello World!" }, (message) => console.log({ message }));
+
+      console.log({ openedChatConnection })
+
+      //Retrive all chats for auth user
+      minchat.getChats(1 /** page to query **/)
+        .then(({ chats, page, totalChats, totalPages }) => {
+          console.log(chats)
+          setChats(chats)
+        })
+    }
+
+    init()
+  }, [])
+
+  return <div>Chats: {chats?.length}</div>
+}
+
+ReactDOM.render(<Test />, document.getElementById('root'));

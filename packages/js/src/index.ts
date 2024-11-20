@@ -15,7 +15,7 @@ import { Status } from "./enums/status"
 
 class MinChat {
    static getInstance(MINCHAT_API_KEY: string): MinChatInstance {
-      return new MinChatInstance(MINCHAT_API_KEY)
+      return new MinChatInstance(MINCHAT_API_KEY).init({ test: false })
    }
 }
 

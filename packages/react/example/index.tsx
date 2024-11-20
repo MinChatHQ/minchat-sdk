@@ -4,7 +4,7 @@ import * as ReactDOM from 'react-dom';
 import { MinChatProvider, useMinChat, useChats, useMessages, useUser, Chat } from '../.';
 
 
-const apiKey = "CLQAJZ09B00007STC893B3TCL"
+const apiKey = "cm3q5j3bn0000dp2k7yukhbwk"
 
 /**
  * 
