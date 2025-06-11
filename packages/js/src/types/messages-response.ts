@@ -1,4 +1,4 @@
-import { FullMessage } from "./full-message"
+import type { FullMessage } from "./full-message"
 
 export type MessagesResponse = {
     messages: FullMessage[],

@@ -3,7 +3,7 @@ import Chat from './chat'
 import MinChatContext from './MinChatContext'
 import useMinChat from './useMinChat'
 import useUser from './useUser'
-import { FullMessage } from '@minchat/js'
+import type { FullMessage } from '@minchat/js'
 
 const useChats = () => {
     const [loading, setLoading] = useState(true)

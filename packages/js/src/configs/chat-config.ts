@@ -1,5 +1,5 @@
-import { User } from "../types/user";
-import { FullMessage } from "../types/full-message";
+import type { User } from "../types/user";
+import type { FullMessage } from "../types/full-message";
 
 class ChatConfig {
 

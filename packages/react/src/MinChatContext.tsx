@@ -1,8 +1,8 @@
 import { createContext } from "react";
 import MinChatInstanceReact from "./MinChatInstanceReact";
 import Chat from "./chat";
-import { User } from "@minchat/js/dist/types/user";
-import { Message } from "@minchat/js/dist/types/message";
+import type { User } from "@minchat/js";
+import type { Message } from "@minchat/js";
 
 //todo possibly persist the cache for messages here
 export default createContext<{

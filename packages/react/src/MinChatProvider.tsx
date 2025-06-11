@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from 'react'
-import { ManagerOptions, SocketOptions } from 'socket.io-client'
+import { useEffect, useState } from 'react'
+import type { ManagerOptions, SocketOptions } from 'socket.io-client'
 import MinChatContext from './MinChatContext'
-import { UserProps } from '@minchat/js/dist/types/user-props'
-import { Message } from '@minchat/js/dist/types/message'
-import { User } from '@minchat/js/dist/types/user'
+import type { UserProps, Message, User } from '@minchat/js'
 import MinChatInstanceReact, { MinChat } from './MinChatInstanceReact'
 import Chat from './chat'
 

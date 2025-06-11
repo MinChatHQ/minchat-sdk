@@ -3,7 +3,7 @@ import MinChatContext from "./MinChatContext"
 import MinChatInstanceReact from "./MinChatInstanceReact"
 
 /**
- * hook to get the chatbunny instance
+ * hook to get the minchat instance
  */
 const useMinChat = (): MinChatInstanceReact | undefined => {
     const { minChat } = useContext(MinChatContext)

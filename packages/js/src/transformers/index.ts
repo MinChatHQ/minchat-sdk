@@ -1,8 +1,8 @@
 import Chat from "../chat"
-import { ChatsResponse } from "../types/chats-response"
-import { FullMessage } from "../types/full-message"
-import { MessagesResponse } from "../types/messages-response"
-import { User } from "../types/user"
+import type { ChatsResponse } from "../types/chats-response"
+import type { FullMessage } from "../types/full-message"
+import type { MessagesResponse } from "../types/messages-response"
+import type { User } from "../types/user"
 import Config from "../configs/config";
 
 /**

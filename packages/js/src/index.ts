@@ -1,17 +1,17 @@
 import Chat from "./chat"
 import { MinChatInstance } from "./minchat-instance"
 
-import { ChatsResponse } from "./types/chats-response"
-import { File, AltFile } from "./types/file"
-import { Message } from "./types/message"
-import { User } from "./types/user"
-import { UserProps } from "./types/user-props"
-import { FullMessage } from "./types/full-message"
-import { GroupChatProps } from "./types/group-chat-props"
-import { SingleChatProps } from "./types/single-chat-props"
-import { MessagesResponse } from "./types/messages-response"
-import { SendMessage } from "./types/send-message"
-import { Status } from "./enums/status"
+import type { ChatsResponse } from "./types/chats-response"
+import type { File, AltFile } from "./types/file"
+import type { Message } from "./types/message"
+import type { User } from "./types/user"
+import type { UserProps } from "./types/user-props"
+import type { FullMessage } from "./types/full-message"
+import type { GroupChatProps } from "./types/group-chat-props"
+import type { SingleChatProps } from "./types/single-chat-props"
+import type { MessagesResponse } from "./types/messages-response"
+import  type { SendMessage } from "./types/send-message"
+import  { Status } from "./enums/status"
 
 class MinChat {
    static getInstance(MINCHAT_API_KEY: string): MinChatInstance {
@@ -35,7 +35,9 @@ class MinChat {
 
 
 
-export {
+export { Status }
+
+export type {
    Chat,
    ChatsResponse,
    File,
@@ -47,8 +49,7 @@ export {
    GroupChatProps,
    MessagesResponse,
    SendMessage,
-   Status,
-   SingleChatProps
+   SingleChatProps,
 }
 
 

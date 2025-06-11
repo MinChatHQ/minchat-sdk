@@ -1,11 +1,11 @@
 import ChatConfig from "./configs/chat-config";
 import axios from "axios"
 import Config from "./configs/config";
-import { User } from "./types/user";
-import { SendMessage } from "./types/send-message";
+import type { User } from "./types/user";
+import type { SendMessage } from "./types/send-message";
 import { transformMessage, transformMessagesResponse, transformUser } from "./transformers";
-import { FullMessage } from "./types/full-message";
-import { MessagesResponse } from "./types/messages-response";
+import type { FullMessage } from "./types/full-message";
+import type { MessagesResponse } from "./types/messages-response";
 import { prepareFileForUpload } from "./utils/file-utils";
 import { Status } from "./enums/status";
 

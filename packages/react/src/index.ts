@@ -1,22 +1,23 @@
 import useMessages from "./useMessages";
 import useChats from "./useChats";
-import MinChatProvider, { Props as MinChatProviderProps } from "./MinChatProvider";
+import MinChatProvider, { type Props as MinChatProviderProps } from "./MinChatProvider";
 import useMinChat from "./useMinChat";
-import { MinChat } from "./MinChatInstanceReact";
+import MinChatInstanceReact, { MinChat } from "./MinChatInstanceReact";
 import Chat from "./chat";
 import useUser from "./useUser"
 
+
 import {
-   ChatsResponse,
-   File,
-   AltFile,
-   Message,
-   User,
-   UserProps,
-   FullMessage,
-   GroupChatProps,
-   MessagesResponse,
-   SendMessage
+   type ChatsResponse,
+   type File,
+   type AltFile,
+   type Message,
+   type User,
+   type UserProps,
+   type FullMessage,
+   type GroupChatProps,
+   type MessagesResponse,
+   type SendMessage
 } from '@minchat/js'
 
 
@@ -27,18 +28,19 @@ export {
    useChats,
    useUser,
    Chat,
+   MinChatInstanceReact,
 
-   MinChatProviderProps,
-   ChatsResponse,
-   File,
-   AltFile,
-   Message,
-   User,
-   UserProps,
-   FullMessage,
-   GroupChatProps,
-   MessagesResponse,
-   SendMessage
+   type MinChatProviderProps,
+   type ChatsResponse,
+   type File,
+   type AltFile,
+   type Message,
+   type User,
+   type UserProps,
+   type FullMessage,
+   type GroupChatProps,
+   type MessagesResponse,
+   type SendMessage
 }
 
 export default MinChat

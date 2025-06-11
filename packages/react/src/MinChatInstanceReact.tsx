@@ -1,12 +1,10 @@
-import MinChatJs, { SingleChatProps } from "@minchat/js"
+import MinChatJs, { type SingleChatProps } from "@minchat/js"
 
 import Chat from "./chat";
-import { ManagerOptions, SocketOptions } from "socket.io-client";
-import { UserProps } from "@minchat/js/dist/types/user-props";
-import { MinChatInstance } from "@minchat/js/dist/minchat-instance";
-import { GroupChatProps } from "@minchat/js/dist/types/group-chat-props";
-import { User } from "@minchat/js/dist/types/user";
-import { UpdateUserProps } from "@minchat/js/dist/types/update-user-props";
+import type { ManagerOptions, SocketOptions } from "socket.io-client";
+import type { UserProps, GroupChatProps, User } from "@minchat/js";
+import type { MinChatInstance } from "@minchat/js/dist/minchat-instance";
+import type { UpdateUserProps } from "@minchat/js/dist/types/update-user-props";
 
 export class MinChat {
     static getInstance(MINCHAT_API_KEY: string): MinChatInstanceReact {

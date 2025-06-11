@@ -1,4 +1,4 @@
-import { FullMessage, User, Chat as ChatJS, Status } from "@minchat/js";
+import type { FullMessage, User, Chat as ChatJS, Status } from "@minchat/js";
 
 class Chat {
     jsChat: ChatJS

@@ -1,6 +1,6 @@
 export interface File {
     lastModified: number;
-    lastModifiedDate: Date;
+    lastModifiedDate?: Date;
     name: string;
     size: number;
     type: string;
@@ -8,7 +8,7 @@ export interface File {
     arrayBuffer(): Promise<ArrayBuffer>;
     stream(): any;
     text(): Promise<string>;
-    url: string;
+    url?: string;
 }
 
 export interface AltFile {

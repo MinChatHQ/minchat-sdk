@@ -1,4 +1,4 @@
-import { AltFile, File } from "./file"
+import type { AltFile, File } from "./file"
 
 export type UpdateUserProps = {
     name?: string,

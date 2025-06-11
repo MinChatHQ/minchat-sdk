@@ -1,6 +1,5 @@
-import { useMinChat, useChats, useMessages, useUser, User } from '@minchat/react';
+import { useMinChat, useChats, useMessages, useUser, type User , type Chat, MinChatInstanceReact} from '@minchat/react';
 import React, { useContext, useEffect, useRef, useState } from 'react'
-import Chat from '@minchat/react/src/chat';
 import styled from 'styled-components';
 import UiContext from '../../UiContext';
 import {
@@ -15,10 +14,9 @@ import {
   MessageInput,
   useTypingListener,
   MessageContainer,
+  type ConversationType,
 } from "@minchat/react-chat-ui";
-import ConversationType from '@minchat/react-chat-ui/dist/types/ConversationType';
-import MinChatInstanceReact from '@minchat/react/dist/MinChatInstanceReact';
-import { RenderProps } from '../..';
+import { type RenderProps } from '../..';
 import useThrottle from '../../hooks/useThrottle';
 import { Status } from '@minchat/js';
 

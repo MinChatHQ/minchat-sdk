@@ -2,9 +2,7 @@ import { useState, useEffect, useContext } from 'react'
 import Chat from './chat'
 import MinChatContext from './MinChatContext'
 import useUser from './useUser'
-import { FullMessage } from '@minchat/js/dist/types/full-message'
-import { SendMessage } from '@minchat/js/dist/types/send-message'
-import { MessagesResponse } from '@minchat/js/dist/types/messages-response'
+import type { FullMessage, SendMessage, MessagesResponse } from '@minchat/js'
 
 /**
  * 

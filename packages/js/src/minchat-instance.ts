@@ -1,15 +1,15 @@
 import Chat from "./chat"
 import Config from "./configs/config"
 import { transformChat, transformChatsResponse, transformUser } from "./transformers";
-import { ChatsResponse } from "./types/chats-response";
-import { GroupChatProps } from "./types/group-chat-props";
-import { SingleChatProps } from "./types/single-chat-props";
-import { UpdateUserProps } from "./types/update-user-props";
-import { User } from "./types/user"
-import { UserProps } from "./types/user-props";
+import type { ChatsResponse } from "./types/chats-response";
+import type { GroupChatProps } from "./types/group-chat-props";
+import type { SingleChatProps } from "./types/single-chat-props";
+import type { UpdateUserProps } from "./types/update-user-props";
+import type { User } from "./types/user"
+import type { UserProps } from "./types/user-props";
 import { prepareFileForUpload } from "./utils/file-utils";
 import getAxios from "./utils/get-axios";
-import { io, ManagerOptions, SocketOptions } from "socket.io-client"
+import { io, type ManagerOptions, type SocketOptions } from "socket.io-client"
 
 const axios = getAxios()
 
@@ -88,7 +88,7 @@ export class MinChatInstance {
         if (configurations.demo) this.config.apiKey = "demo"
 
         this.config.socketOptions = configurations.socketOptions
-        let options = { transports: ['websocket'] }
+        let options: any = { transports: ['websocket'] }
         if (configurations.socketOptions) options = { ...options, ...configurations.socketOptions }
         this.config.socket = io(this.config.test ? this.config.localhostPath : this.config.productionPath, options);
         return this

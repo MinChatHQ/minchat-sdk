@@ -1,9 +1,8 @@
-import MinChat, { Chat, FullMessage, MinChatProvider, User, UserProps } from '@minchat/react';
-import React, { FC, HTMLAttributes } from 'react';
+import MinChat, { type Chat, type FullMessage, MinChatProvider, type User, type UserProps, MinChatInstanceReact } from '@minchat/react';
+import React, { type FC, type HTMLAttributes } from 'react';
 import Inbox from './components/inbox';
 import UiContext from './UiContext';
 import './index.css'
-import MinChatInstanceReact from '@minchat/react/dist/MinChatInstanceReact';
 import { MinChatUiProvider } from '@minchat/react-chat-ui';
 
 type RenderInputProps = {
@@ -135,6 +134,7 @@ export const MinChatUI: FC<Props> = ({
   ...restProps
 
 }) => {
+
   return <MinChatProvider
     demo={demo}
     test={test}

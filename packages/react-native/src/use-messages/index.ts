@@ -1,4 +1,4 @@
-import { useMessages as useReactUseMessages, Chat, FullMessage } from '@minchat/react'
+import { useMessages as useReactUseMessages, Chat, type FullMessage } from '@minchat/react'
 
 interface File {
     uri: string;

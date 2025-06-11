@@ -1,5 +1,5 @@
-import { MinChatProviderProps, MinChatProvider as ReactMinChatProvider } from '@minchat/react'
 import React from 'react'
+import { type MinChatProviderProps, MinChatProvider as ReactMinChatProvider } from '@minchat/react'
 
 const MinChatProvider = (props: MinChatProviderProps) => {
     return (
