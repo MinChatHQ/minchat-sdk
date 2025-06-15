@@ -89,7 +89,7 @@ export interface RenderProps extends HTMLAttributes<HTMLDivElement> {
   renderLoader?: (props: RenderLoaderProps) => React.ReactNode | null
   renderMessageList?: (props: RenderMessageListProps) => React.ReactNode | null
   renderInput?: (props: RenderInputProps) => React.ReactNode | null
-  renderChatListHeader?: (props: RenderChatListHeaderProps) => React.ReactNode | null
+  // renderChatListHeader?: (props: RenderChatListHeaderProps) => React.ReactNode | null
   renderMessageListHeader?: (props: RenderMessageListHeaderProps) => React.ReactNode | null
   renderIsTyping?: (props: RenderIsTypingProps) => React.ReactNode | null
 }

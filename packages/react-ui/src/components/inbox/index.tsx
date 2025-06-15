@@ -7,7 +7,6 @@ import {
   useCheckIsMobile,
   Sidebar,
   ConversationList,
-  ConversationHeader,
   MessageHeader,
   MessageList,
   MessageListBackground,
@@ -56,12 +55,15 @@ export default function Inbox({
   renderEmptyMessages = () => undefined,
   renderEmptyChats = () => undefined,
   renderLoader = () => undefined,
-  renderChatListHeader = ({ isMobile }) => isMobile ? <ConversationHeader /> : <div />,
   renderChatItem = () => undefined,
   renderChatList = ({ connectedUser, chats, loading, selectedChat, paginate, openChat, isMobile }) => <ConversationList
     mobileView={isMobile}
     currentUserId={connectedUser.id}
     loading={loading}
+    header={{
+      showAddButton: false,
+      showSearchBar: false,
+    }}
     selectedConversationId={selectedChat ? selectedChat.getId() : undefined}
     customEmptyConversationsComponent={(() => renderEmptyChats({ isMobile }))()}
     customLoaderComponent={(() => renderLoader({ isMobile }))()}
@@ -302,11 +304,6 @@ export default function Inbox({
   }
 
   /**
-   * 
-   */
-  const ChatListHeaderComponent = () => renderChatListHeader({ isMobile: determineIsMobile() })
-
-  /**
  * 
  */
   const ChatListComponent = () => currentUser && renderChatList({
@@ -385,7 +382,6 @@ export default function Inbox({
             </MessageContainer>
             :
             <div style={{ position: "relative", width: "100%" }}>
-              {ChatListHeaderComponent()}
               {ChatListComponent()}
             </div>
         )
@@ -394,7 +390,6 @@ export default function Inbox({
           /* desktop view */
           <>
             <Sidebar>
-              {ChatListHeaderComponent()}
               {ChatListComponent()}
             </Sidebar>
 
