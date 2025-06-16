@@ -1,8 +1,8 @@
 {
   "name": "@minchat/reactui",
-  "version": "4.0.3",
+  "version": "4.0.9",
   "author": "MinChat",
-  "description": "Minchat UI  SDK for React",
+  "description": "Minchat UI SDK for React",
   "main": "dist/minchat-sdk.umd.js",
   "module": "dist/minchat-sdk.es.js",
   "types": "dist/index.d.ts",
@@ -11,20 +11,20 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "npm run clean && tsc && vite build",
+    "build": "npm run clean && vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist",
     "test": "vitest",
     "push-dev": "npm run build && npm publish --tag dev",
     "push": "npm run build && npm publish"
   },
-  "peerDependencies": {
-    "react": ">=16.0.0",
-    "react-dom": ">=16.0.0"
-  },
   "dependencies": {
-    "@minchat/react": "^4.0.10",
-    "@minchat/react-chat-ui": "^1.2.3"
+    "@minchat/react": "^4.0.13",
+    "@minchat/react-chat-ui": "^1.2.8"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
@@ -37,12 +37,13 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
     "react-router-dom": "^7.6.2",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.30.1",
     "vite": "^6.3.5",
+    "vite-plugin-css-injected-by-js": "^3.5.2",
     "vite-plugin-dts": "^4.5.4",
     "vitest": "^3.2.3"
   }

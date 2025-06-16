@@ -1,6 +1,6 @@
 {
   "name": "@minchat/react",
-  "version": "4.0.10",
+  "version": "4.0.13",
   "author": "MinChat",
   "description": "Minchat SDK for React",
   "main": "dist/minchat-sdk.umd.js",
@@ -22,8 +22,8 @@
     "@minchat/js": "^4.0.9"
   },
   "peerDependencies": {
-    "react": ">=16.0.0",
-    "react-dom": ">=16.0.0"
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
@@ -37,8 +37,8 @@
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
     "jsdom": "^26.1.0",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.30.1",
     "vite": "^6.3.5",

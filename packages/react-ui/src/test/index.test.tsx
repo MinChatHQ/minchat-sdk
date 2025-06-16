@@ -8,18 +8,18 @@ import { MinChatUI } from '..';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 
 
-// This is Jest test setup file
-global.ResizeObserver = class ResizeObserver {
-    observe() {
-        // do nothing
-    }
-    unobserve() {
-        // do nothing
-    }
-    disconnect() {
-        // do nothing
-    }
-};
+// // This is Jest test setup file
+// global.ResizeObserver = class ResizeObserver {
+//     observe() {
+//         // do nothing
+//     }
+//     unobserve() {
+//         // do nothing
+//     }
+//     disconnect() {
+//         // do nothing
+//     }
+// };
 
 
 describe("MinChat Instance", () => {

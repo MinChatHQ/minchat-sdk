@@ -1,5 +1,5 @@
 import MinChat, { type Chat, type FullMessage, MinChatProvider, type User, type UserProps, MinChatInstanceReact } from '@minchat/react';
-import React, { type FC, type HTMLAttributes } from 'react';
+import React from 'react';
 import Inbox from './components/inbox';
 import UiContext from './UiContext';
 import './index.css'
@@ -81,7 +81,7 @@ type RenderChatListHeaderProps = {
 /**
  * 
  */
-export interface RenderProps extends HTMLAttributes<HTMLDivElement> {
+export interface RenderProps {
   renderEmptyChats?: (props: RenderEmtpyChatsProps) => React.ReactNode | null
   renderEmptyMessages?: (props: RenderEmptyMessagesProps) => React.ReactNode | null
   renderChatItem?: (props: RenderChatItemProps) => React.ReactNode | null
@@ -123,17 +123,22 @@ export {
 /**
  * MinChat UI component
  */
-export const MinChatUI: FC<Props> = ({
-  apiKey,
-  user,
-  height = "full",
-  demo = false,
-  test = false,
-  theme = '#6ea9d7',
-  colorSet,
-  ...restProps
+export function MinChatUI(props: Props) {
+  // Only render in the browser
+  if (typeof window === "undefined") {
+    return null;
+  }
 
-}) => {
+  const {
+    apiKey,
+    user,
+    height = "full",
+    demo = false,
+    test = false,
+    theme = '#6ea9d7',
+    colorSet,
+    ...restProps
+  } = props;
 
   return <MinChatProvider
     demo={demo}
