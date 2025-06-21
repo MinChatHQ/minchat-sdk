@@ -1,6 +1,6 @@
 {
   "name": "@minchat/reactui",
-  "version": "4.0.9",
+  "version": "4.0.10",
   "author": "MinChat",
   "description": "Minchat UI SDK for React",
   "main": "dist/minchat-sdk.umd.js",
@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@minchat/react": "^4.0.13",
-    "@minchat/react-chat-ui": "^1.2.8"
+    "@minchat/react-chat-ui": "^1.2.9"
   },
   "peerDependencies": {
     "react": ">=18.0.0",
