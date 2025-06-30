@@ -59,6 +59,13 @@ class Chat {
         return this.jsChat.onMemberStatusChanged(listener)
     }
 
+    onAiAction(listener: (data: {
+        event: string,
+        chatbotUsername: string
+    }) => void) {
+        return this.jsChat.onAiAction(listener)
+    }
+
     async startTyping() {
         return this.jsChat.startTyping()
     }

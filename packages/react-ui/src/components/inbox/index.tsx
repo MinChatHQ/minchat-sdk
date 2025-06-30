@@ -1,4 +1,4 @@
-import { useMinChat, useChats, useMessages, useUser, type User , type Chat, MinChatInstanceReact} from '@minchat/react';
+import { useMinChat, useChats, useMessages, useUser, type User, type Chat, MinChatInstanceReact } from '@minchat/react';
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components';
 import UiContext from '../../UiContext';
@@ -30,6 +30,10 @@ interface Props extends RenderProps {
   disableInput?: boolean
   demo: boolean
   openChatId?: string
+  onAiAction?: (data: {
+    event: string,
+    chatbotUsername: string
+  }) => void
 }
 
 interface ContainerProps {
@@ -51,6 +55,7 @@ export default function Inbox({
   disableInput = false,
   demo,
   openChatId,
+  onAiAction,
   // render props
   renderEmptyMessages = () => undefined,
   renderEmptyChats = () => undefined,
@@ -245,6 +250,10 @@ export default function Inbox({
         selectedChat.onTypingStopped((_) => {
           setTypingUser(undefined)
         })
+
+        if (onAiAction) {
+          selectedChat.onAiAction(onAiAction)
+        }
 
         const memberIds = selectedChat.getMemberIds()
 

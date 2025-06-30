@@ -1,6 +1,6 @@
 {
   "name": "@minchat/react",
-  "version": "4.0.13",
+  "version": "4.1.0",
   "author": "MinChat",
   "description": "Minchat SDK for React",
   "main": "dist/minchat-sdk.umd.js",
@@ -19,7 +19,7 @@
     "push": "npm run build && npm publish"
   },
   "dependencies": {
-    "@minchat/js": "^4.0.9"
+    "@minchat/js": "^4.1.0"
   },
   "peerDependencies": {
     "react": ">=18.0.0",

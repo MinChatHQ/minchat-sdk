@@ -366,6 +366,17 @@ class Chat {
         }
     }
 
+
+    onAiAction(listener: (data: {
+        event: string,
+        chatbotUsername: string
+    }) => void) {
+        this.joinRoom()
+        this.mainConfig?.socket?.on('ai.event', (data: any) => {
+            listener && listener(data)
+        });
+    }
+
     onMessage(listener: (data: FullMessage) => void) {
         this.joinRoom()
         this.mainConfig?.socket?.on('message', (data: any) => {

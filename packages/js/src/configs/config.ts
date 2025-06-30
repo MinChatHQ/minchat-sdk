@@ -2,7 +2,7 @@ import type { User } from "../types/user"
 import { type ManagerOptions, Socket,type SocketOptions } from "socket.io-client"
 
 
-export const LOCALHOST_PATH = "http://localhost:4000"
+export const LOCALHOST_PATH = "http://localhost:4001"
 export const PRODUCTION_PATH = "https://api.minchat.io"
 
 class Config {
