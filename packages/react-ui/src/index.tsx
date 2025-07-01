@@ -115,7 +115,7 @@ export interface Props extends RenderProps {
   disableInput?: boolean
   openChatId?: string
   onAiAction?: (data: {
-    chatId?: string,
+    chat_id: string,
     event: string,
     chatbotUsername: string
   }) => void

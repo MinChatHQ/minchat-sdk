@@ -61,7 +61,8 @@ class Chat {
 
     onAiAction(listener: (data: {
         event: string,
-        chatbotUsername: string
+        chatbotUsername: string,
+        chat_id: string
     }) => void) {
         return this.jsChat.onAiAction(listener)
     }

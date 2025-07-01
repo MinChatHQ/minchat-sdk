@@ -370,6 +370,7 @@ class Chat {
     onAiAction(listener: (data: {
         event: string,
         chatbotUsername: string
+        chat_id: string
     }) => void) {
         this.joinRoom()
         this.mainConfig?.socket?.on('ai.event', (data: any) => {

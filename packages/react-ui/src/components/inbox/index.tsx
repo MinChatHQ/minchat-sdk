@@ -31,7 +31,7 @@ interface Props extends RenderProps {
   demo: boolean
   openChatId?: string
   onAiAction?: (data: {
-    chatId?: string,
+    chat_id: string,
     event: string,
     chatbotUsername: string
   }) => void
@@ -253,12 +253,7 @@ export default function Inbox({
         })
 
         if (onAiAction) {
-          selectedChat.onAiAction((data) => {
-            onAiAction({
-              chatId: selectedChat.getId(),
-              ...data
-            })
-          })
+          selectedChat.onAiAction(onAiAction)
         }
 
         const memberIds = selectedChat.getMemberIds()

@@ -1,6 +1,6 @@
 {
   "name": "@minchat/reactnative",
-  "version": "4.1.1",
+  "version": "4.1.2",
   "author": "MinChat",
   "description": "Minchat SDK for React Native",
   "main": "dist/minchat-sdk.umd.js",
@@ -28,6 +28,6 @@
     "vite-plugin-dts": "^4.5.4"
   },
   "dependencies": {
-    "@minchat/react": "^4.1.0"
+    "@minchat/react": "^4.1.2"
   }
 }
