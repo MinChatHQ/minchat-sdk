@@ -126,8 +126,13 @@ function App() {
           <div className='container'>
             <MinChatUI
               test={true}
-              openChatId='clqdhzd6f000ltcdofbp5vedo'
-              groupChatTitle='Groupies'
+              // openChatId='clqdhzd6f000ltcdofbp5vedo'
+              // groupChatTitle='Groupies'
+              startConversation={async (minchat) => {
+                const u2 = await minchat.createUser(user2);
+                // const u3 = await minchat.createUser(user3);
+                return u2.username;
+              }}
               user={user1}
               apiKey={apiKey}
               renderIsTyping={({ user }) => <div>{user.name} is typing</div>}
@@ -137,7 +142,7 @@ function App() {
               test={true}
               startConversation={async (minchat) => {
                 const u1 = await minchat.createUser(user1);
-                const u3 = await minchat.createUser(user3);
+                // const u3 = await minchat.createUser(user3);
                 return u1.username;
               }}
               user={user2}
@@ -151,7 +156,7 @@ function App() {
             <div className='sq'>
               <div className='innersq'>
                 <MinChatUI
-                  groupChatTitle='Redemption arc'
+                  // groupChatTitle='Redemption arc'
                   startConversation={async (minchat) => {
                     const user = await minchat.createUser(user2);
                     return user.username;

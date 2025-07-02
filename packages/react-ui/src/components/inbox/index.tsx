@@ -258,23 +258,21 @@ export default function Inbox({
 
         const memberIds = selectedChat.getMemberIds()
 
+        console.log({ memberIds, })
         if (memberIds.length === 1 && minchat) {
-          // query last active
-          const user = await minchat.fetchUserById(memberIds[0])
-          setLastOnline(user.lastActive)
-          // add listener
-          selectedChat.onMemberStatusChanged((_, status) => {
-            if (status === Status.ONLINE) {
-              lastActiveIntervalId = setInterval(() => {
-                setLastOnline(new Date())
-              }, 50_000)
 
-              setLastOnline(new Date())
-            } else {
-              // its offline so disable the online interval update
-              clearInterval(lastActiveIntervalId)
+          function getStatus() {
+            const members = selectedChat?.getMembers()
+            const member = members?.find(member => memberIds[0] === member.id)
+            console.log({ member })
+            if (member) {
+              setLastOnline(member.lastActive)
             }
-          })
+          }
+
+          setInterval(getStatus, 10_000)
+          getStatus()
+
         } else {
           setLastOnline(undefined)
         }

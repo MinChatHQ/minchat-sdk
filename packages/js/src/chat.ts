@@ -17,10 +17,15 @@ class Chat {
     //the config object for this chat object
     config: ChatConfig
 
+    // Interval for chatbot activity updates
+    private _chatbotInterval?: ReturnType<typeof setInterval>
 
     constructor(minChatConfig: Config) {
         this.mainConfig = minChatConfig
         this.config = new ChatConfig()
+
+        this.onMemberStatusChanged(() => { })
+
     }
 
     async setMetaData(metadata: Record<string, string | number | boolean>) {
@@ -108,6 +113,7 @@ class Chat {
                 // update the members
                 if (response.data.success) {
                     const user = transformUser(response.data.participant)
+
                     //dont add member if its the connected user
                     if (this.mainConfig.user?.id !== user.id) {
                         let isAlreadyMember = false
@@ -118,6 +124,11 @@ class Chat {
                         if (!isAlreadyMember) this.config.members.push(user)
 
                         if (!this.config.memberIds.includes(user.id)) this.config.memberIds.push(user.id)
+
+                        //its a chatbot that was added
+                        if (user.metadata?.chatbotId) {
+                            this._initChatbots()
+                        }
                     }
                 }
 
@@ -225,7 +236,7 @@ class Chat {
                 }
 
                 //join the channel
-                this.joinRoom()
+                this._joinRoom()
 
                 const messagesResponse = transformMessagesResponse(response.data)
 
@@ -356,7 +367,7 @@ class Chat {
     /**
      * an internal function to join the room
      */
-    joinRoom() {
+    _joinRoom() {
         //channel is already defined so listen to the room
         if (this.config.channelId) {
             this.mainConfig?.socket?.emit('room.join', {
@@ -372,14 +383,14 @@ class Chat {
         chatbotUsername: string
         chat_id: string
     }) => void) {
-        this.joinRoom()
+        this._joinRoom()
         this.mainConfig?.socket?.on('ai.event', (data: any) => {
             listener && listener(data)
         });
     }
 
     onMessage(listener: (data: FullMessage) => void) {
-        this.joinRoom()
+        this._joinRoom()
         this.mainConfig?.socket?.on('message', (data: any) => {
             //update the last message
             if (data.success) {
@@ -391,8 +402,9 @@ class Chat {
         });
     }
 
+
     onMessageUpdated(listener: (data: FullMessage) => void) {
-        this.joinRoom()
+        this._joinRoom()
         this.mainConfig?.socket?.on('message.update', (data: any) => {
             if (data.success) {
                 const transformedMessage = transformMessage(data)
@@ -403,7 +415,7 @@ class Chat {
 
     onMessageDeleted(listener: (messageId: string) => void) {
 
-        this.joinRoom()
+        this._joinRoom()
         this.mainConfig?.socket?.on('message.delete', (data: any) => {
             listener && listener(data)
         });
@@ -422,7 +434,7 @@ class Chat {
 
     // handle user starts typing
     onTypingStarted(listener: (user: User) => void) {
-        this.joinRoom()
+        this._joinRoom()
         this.mainConfig?.socket?.on('typing.start', (data: any) => {
             listener && listener(data)
         });
@@ -430,7 +442,7 @@ class Chat {
 
     // handle user stops typing
     onTypingStopped(listener: (user: User) => void) {
-        this.joinRoom()
+        this._joinRoom()
         this.mainConfig?.socket?.on('typing.stop', (data: any) => {
             listener && listener(data)
         });
@@ -456,56 +468,69 @@ class Chat {
         })
     }
 
+
     /**
      * 
      */
     async onMemberStatusChanged(listener: (memberId: string, status: Status) => void) {
-        //this onMemberStatusChanged simply executes whenever i add the listener and returns the other participants that are connected to the socket
-        //it also invokes when participants connect or disconnects from the socket
-        // actual logic simply uses polling the socket to check if a user is currently online
-        const makeQuery = () => {
-            // check for each member of the chat if they are online
-            for (const memberId of this.config.memberIds) {
-                this.mainConfig?.socket?.emit('user.status', {
-                    memberId,
-                    apiKey: this.mainConfig.apiKey,
-                },
-                    (data: { memberId: string, status: string }) => {
-                        let status: Status | null = null
+        this._joinRoom()
 
-                        // check if the status differs from the already existing status and only execute if its different
-                        switch (data.status) {
-                            case "online":
-                                // should not previously be in the online array
-                                if (!this.config.memberIdsOnline.includes(data.memberId)) {
-                                    status = Status.ONLINE
-                                    this.config.memberIdsOnline.push(data.memberId)
-                                }
-                                break
-                            default:
-                                if (this.config.memberIdsOnline.includes(data.memberId)) {
-                                    status = Status.OFFLINE
-                                    this.config.memberIdsOnline = this.config.memberIdsOnline.filter(id => id !== data.memberId)
-                                }
-                                break
-                        }
+        this.mainConfig?.socket?.on('user.status', (data: { memberId: string, status: string }) => {
+            let status: Status | null = null
 
-
-                        if (status !== null) {
-                            listener && listener(data.memberId, status)
-                        }
-                    })
+            // check if the status differs from the already existing status and only execute if its different
+            switch (data.status) {
+                case "online":
+                    // should not previously be in the online array
+                    if (!this.config.memberIdsOnline.includes(data.memberId)) {
+                        status = Status.ONLINE
+                        this.config.memberIdsOnline.push(data.memberId)
+                    }
+                    break
+                default:
+                    if (this.config.memberIdsOnline.includes(data.memberId)) {
+                        status = Status.OFFLINE
+                        this.config.memberIdsOnline = this.config.memberIdsOnline.filter(id => id !== data.memberId)
+                    }
+                    break
             }
+
+
+            if (status !== null) {
+                listener && listener(data.memberId, status)
+            }
+        })
+    }
+
+    /**
+     * 
+     */
+    _init() {
+        this._initChatbots()
+        this._initMemberStatusPolling()
+    }
+
+    /**
+     * 
+     */
+    private _initMemberStatusPolling() {
+        const _makeQuery = () => {
+
+            this.mainConfig?.socket?.emit('user.status', {
+                memberId: this.mainConfig.user?.id,
+                apiKey: this.mainConfig.apiKey,
+                channelId: this.config.channelId
+            },
+            )
         }
 
         // execute the first time
-        makeQuery()
+        _makeQuery()
 
-        // if its 1 on 1 conversation then check every 10 seconds, for group chats check every 5 minutes
-        const interval = this.config.memberIds.length === 1 ? 10_000 : (60_000 * 5)
-        setInterval(makeQuery, interval)
+        // if its less than 10 members then check trigger 20 seconds, for group chats check trigger 5 minutes
+        const interval = this.config.memberIds.length === 10 ? 20_000 : (60_000 * 5)
+        setInterval(_makeQuery, interval)
     }
-
 
     onError(listener: (data: any) => void) {
         this.mainConfig?.socket?.on('error', (data: any) => {
@@ -522,6 +547,32 @@ class Chat {
         this.mainConfig?.socket?.off('message')
         this.mainConfig?.socket?.off('error')
 
+        // Clear chatbot interval if set
+        if (this._chatbotInterval) {
+            clearInterval(this._chatbotInterval)
+            this._chatbotInterval = undefined
+        }
+    }
+
+    private _initChatbots() {
+        // Only set up the interval if it doesn't already exist
+        if (this._chatbotInterval) return
+
+        const chatbot = this.config.members.find(member => member.metadata?.chatbotId)
+
+        if (!chatbot) return
+
+        this._chatbotInterval = setInterval(() => {
+            for (const member of this.config.members) {
+                if (member.metadata && member.metadata.chatbotId) {
+                    member.lastActive = new Date()
+                    // Ensure chatbot is in memberIdsOnline
+                    if (!this.config.memberIdsOnline.includes(member.id)) {
+                        this.config.memberIdsOnline.push(member.id)
+                    }
+                }
+            }
+        }, 40_000)
     }
 }
 

@@ -279,6 +279,9 @@ export class MinChatInstance {
                 chat.config.avatar = members[0]?.avatar
                 chat.config.title = members[0]?.name && members[0]?.name.trim().length > 0 ? members[0].name : "No Name"
 
+
+                chat._init()
+
             } catch (e) {
                 console.log(e)
                 return undefined
@@ -334,6 +337,8 @@ export class MinChatInstance {
             chat.config.metadata = response.data.metadata
             chat.config.avatar = response.data.avatar
             chat.config.title = response.data.title && response.data.title.trim().length > 0 ? response.data.title.trim() : "Group Chat"
+
+            chat._init()
 
             return chat
         } else {

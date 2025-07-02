@@ -63,6 +63,8 @@ export const transformChat = (serverChat: any, config: Config) => {
     chat.config.createdAt = new Date(serverChat.created_at)
     chat.config.metadata = serverChat.metadata
     chat.config.avatar = serverChat.avatar
+    
+    chat._init()
 
     return chat
 

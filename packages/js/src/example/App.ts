@@ -19,6 +19,14 @@ export class App {
     const instance = MinChat.getInstance(this.apiKey).init({ test: this.test });
     await instance.connectUser({ username: 'fredrick', name: 'Fred' });
     this.minchatInstance = instance;
+
+    const chats = await instance.getChats(1);
+    console.log(chats);
+
+    const messages = await chats.chats[0].getMessages();
+    console.log(messages);
+
+
     this.render();
   }
 
