@@ -1,5 +1,4 @@
 import ChatConfig from "./configs/chat-config";
-import axios from "axios"
 import Config from "./configs/config";
 import type { User } from "./types/user";
 import type { SendMessage } from "./types/send-message";
@@ -32,22 +31,19 @@ class Chat {
         if (this.config.channelId) {
 
             try {
-
-                const response = await axios.patch((this.mainConfig.test ? this.mainConfig.localhostPath : this.mainConfig.productionPath) + '/v1/chat/' + this.config.channelId, {
-                    metadata
-                },
-                    {
-                        headers: {
-                            Authorization: "Bearer " + this.mainConfig.apiKey
-                        },
-                    })
-
-                //update the channel id if one does not already exists
-                if (response.data.metadata) {
-                    this.config.metadata = response.data.metadata
+                const response = await fetch((this.mainConfig.test ? this.mainConfig.localhostPath : this.mainConfig.productionPath) + '/v1/chat/' + this.config.channelId, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': 'Bearer ' + this.mainConfig.apiKey,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ metadata })
+                });
+                const data = await response.json();
+                if (data.metadata) {
+                    this.config.metadata = data.metadata;
                 }
-
-                return response.data.metadata
+                return data.metadata;
             } catch (e) {
                 console.log(e)
             }
@@ -78,17 +74,13 @@ class Chat {
     async addMember(username: string) {
         if (this.config.channelId) {
             try {
-                const response = await axios.get((this.mainConfig.test ? this.mainConfig.localhostPath : this.mainConfig.productionPath) + '/v1/user', {
+                const response = await fetch((this.mainConfig.test ? this.mainConfig.localhostPath : this.mainConfig.productionPath) + '/v1/user?username=' + encodeURIComponent(username), {
                     headers: {
-                        'Authorization': "Bearer " + this.mainConfig.apiKey
-                    },
-                    params: {
-                        username
+                        'Authorization': 'Bearer ' + this.mainConfig.apiKey
                     }
-                })
-
-                await this.addMemberById(response.data.user.id)
-
+                });
+                const data = await response.json();
+                await this.addMemberById(data.user.id);
             } catch (e) {
                 console.log(e)
             }
@@ -100,38 +92,29 @@ class Chat {
         if (this.config.channelId) {
 
             try {
-
-                const response = await axios.post((this.mainConfig.test ? this.mainConfig.localhostPath : this.mainConfig.productionPath) + '/v1/chat/' + this.config.channelId + '/participants', {
-                    user_id: userId
-                },
-                    {
-                        headers: {
-                            Authorization: "Bearer " + this.mainConfig.apiKey
-                        },
-                    })
-
-                // update the members
-                if (response.data.success) {
-                    const user = transformUser(response.data.participant)
-
-                    //dont add member if its the connected user
+                const response = await fetch((this.mainConfig.test ? this.mainConfig.localhostPath : this.mainConfig.productionPath) + '/v1/chat/' + this.config.channelId + '/participants', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + this.mainConfig.apiKey,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ user_id: userId })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    const user = transformUser(data.participant);
                     if (this.mainConfig.user?.id !== user.id) {
-                        let isAlreadyMember = false
+                        let isAlreadyMember = false;
                         this.config.members.forEach(member => {
-                            if (member.id === user.id) isAlreadyMember = true
-                        })
-
-                        if (!isAlreadyMember) this.config.members.push(user)
-
-                        if (!this.config.memberIds.includes(user.id)) this.config.memberIds.push(user.id)
-
-                        //its a chatbot that was added
+                            if (member.id === user.id) isAlreadyMember = true;
+                        });
+                        if (!isAlreadyMember) this.config.members.push(user);
+                        if (!this.config.memberIds.includes(user.id)) this.config.memberIds.push(user.id);
                         if (user.metadata?.chatbotId) {
-                            this._initChatbots()
+                            this._initChatbots();
                         }
                     }
                 }
-
             } catch (e) {
                 console.log(e)
             }
@@ -140,40 +123,31 @@ class Chat {
     }
 
     async removeMember(username: string) {
-        const response = await axios.get((this.mainConfig.test ? this.mainConfig.localhostPath : this.mainConfig.productionPath) + '/v1/user', {
+        const response = await fetch((this.mainConfig.test ? this.mainConfig.localhostPath : this.mainConfig.productionPath) + '/v1/user?username=' + encodeURIComponent(username), {
             headers: {
-                'Authorization': "Bearer " + this.mainConfig.apiKey
-            },
-            params: {
-                username
+                'Authorization': 'Bearer ' + this.mainConfig.apiKey
             }
-        })
-
-        await this.removeMemberById(response.data.user.id)
+        });
+        const data = await response.json();
+        await this.removeMemberById(data.user.id);
     }
 
     async removeMemberById(userId: string) {
         if (this.config.channelId) {
 
             try {
-
-                const response = await axios.delete((this.mainConfig.test ? this.mainConfig.localhostPath : this.mainConfig.productionPath) + '/v1/chat/' + this.config.channelId + '/participants/' + userId,
-                    {
-                        headers: {
-                            Authorization: "Bearer " + this.mainConfig.apiKey
-                        },
-                    })
-
-
-                // update the members
-                if (response.data.success) {
-                    const user = transformUser(response.data.participant)
-
-                    this.config.members = this.config.members.filter(member => member.id !== user.id)
-                    this.config.memberIds = this.config.memberIds.filter(id => id !== user.id)
-
+                const response = await fetch((this.mainConfig.test ? this.mainConfig.localhostPath : this.mainConfig.productionPath) + '/v1/chat/' + this.config.channelId + '/participants/' + userId, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': 'Bearer ' + this.mainConfig.apiKey
+                    }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    const user = transformUser(data.participant);
+                    this.config.members = this.config.members.filter(member => member.id !== user.id);
+                    this.config.memberIds = this.config.memberIds.filter(id => id !== user.id);
                 }
-
             } catch (e) {
                 console.log(e)
             }
@@ -215,32 +189,23 @@ class Chat {
         if (this.mainConfig.user || this.mainConfig.demo) {
 
             try {
-                const params = {
-                    chat_id: this.config.channelId,
-                    user_id: this.mainConfig.user?.id || "demo",
-                    page
-
-                }
-
-                //todo dynamically switch url between development and production
-                const response = await axios.get((this.mainConfig.test ? this.mainConfig.localhostPath : this.mainConfig.productionPath) + '/v1/messages', {
+                const params = new URLSearchParams({
+                    chat_id: this.config.channelId || '',
+                    user_id: this.mainConfig.user?.id || 'demo',
+                    ...(page !== undefined ? { page: String(page) } : {})
+                });
+                const response = await fetch((this.mainConfig.test ? this.mainConfig.localhostPath : this.mainConfig.productionPath) + '/v1/messages?' + params.toString(), {
                     headers: {
-                        Authorization: "Bearer " + this.mainConfig.apiKey
-                    },
-                    params
-                })
-
-                //update the channel id if one does not already exists
-                if (response.data.channelId && !this.config.channelId) {
-                    this.config.channelId = response.data.channelId
+                        'Authorization': 'Bearer ' + this.mainConfig.apiKey
+                    }
+                });
+                const data = await response.json();
+                if (data.channelId && !this.config.channelId) {
+                    this.config.channelId = data.channelId;
                 }
-
-                //join the channel
-                this._joinRoom()
-
-                const messagesResponse = transformMessagesResponse(response.data)
-
-                return messagesResponse
+                this._joinRoom();
+                const messagesResponse = transformMessagesResponse(data);
+                return messagesResponse;
             } catch (e) {
                 // console.log(e)
             }
@@ -249,7 +214,7 @@ class Chat {
 
         const response: MessagesResponse = {
             success: false,
-            messages: [],
+            messages: [],    
             page: 0,
             totalMessages: 0,
             totalPages: 0,

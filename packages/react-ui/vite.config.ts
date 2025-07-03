@@ -9,10 +9,12 @@ export default defineConfig({
     react(),
     dts({ tsconfigPath: './tsconfig.app.json' }),
     cssInjectedByJsPlugin(),
-    dts({ tsconfigPath: './tsconfig.app.json' })
-
+    dts({ tsconfigPath: './tsconfig.app.json' }),
+    visualizer({ open: true })
   ],
   build: {
+    minify: true,
+    sourcemap: false,
     lib: {
       entry: 'src/index.tsx',
       name: '@minchat/reactui',
@@ -24,7 +26,8 @@ export default defineConfig({
         'react',
         'react-dom',
         'react/jsx-runtime',
-        'react/jsx-dev-runtime'],
+        'react/jsx-dev-runtime',
+        '@minchat/react-chat-ui'],
       output: {
         globals: {
           react: 'React',

@@ -10,6 +10,8 @@ export default defineConfig({
         dts({ tsconfigPath: './tsconfig.app.json' })
     ],
     build: {
+        minify: true,
+        sourcemap: false,
         lib: {
             entry: 'src/index.ts',
             name: '@minchat/react',
@@ -20,7 +22,8 @@ export default defineConfig({
             external: ['react',
                 'react-dom',
                 'react/jsx-runtime',
-                'react/jsx-dev-runtime'
+                'react/jsx-dev-runtime',
+                "@minchat/js"
             ],
             output: {
                 globals: {

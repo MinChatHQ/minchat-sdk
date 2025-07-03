@@ -26,6 +26,8 @@ export class App {
     const messages = await chats.chats[0].getMessages();
     console.log(messages);
 
+    const user = await instance.fetchUserById("cmbpfo0gd0003yn25cw4ydt7x");
+    console.log({ fetchedUserfortesting: user });
 
     this.render();
   }

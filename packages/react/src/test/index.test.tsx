@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { render, screen, waitFor, } from '@testing-library/react';
 import { Chat, MinChatProvider, useChats, useMessages, useMinChat } from ".."
-import axios from "axios";
+// import axios from "axios";
 import '@testing-library/jest-dom/vitest';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 
@@ -11,15 +11,22 @@ describe("MinChat Instance", () => {
     let apiKey: string
 
     beforeAll(async () => {
-        const response = await axios.get("http://localhost:4000/sdk-test")
-        userId = response.data.userId
-        apiKey = response.data.apiKey
+        const response = await fetch("http://localhost:4000/sdk-test");
+        const data = await response.json();
+        userId = data.userId;
+        apiKey = data.apiKey;
     })
 
     afterAll(async () => {
-        await axios.post("http://localhost:4000/sdk-test", {
-            user_id: userId
-        })
+        await fetch("http://localhost:4000/sdk-test", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                user_id: userId
+            })
+        });
     })
 
 

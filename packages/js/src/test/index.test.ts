@@ -2,7 +2,6 @@ import MinChat, { } from '..';
 import { LOCALHOST_PATH } from '../configs/config';
 import { Status } from '../enums/status';
 import type { UserProps } from '../types/user-props';
-import getAxios from '../utils/get-axios';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 
 
@@ -13,15 +12,18 @@ describe("MinChat Instance", () => {
     let apiKey: string
 
     beforeAll(async () => {
-        const response = await getAxios().get(LOCALHOST_PATH + "/sdk-test")
-        userId = response.data.userId
-        apiKey = response.data.apiKey
+        const response = await fetch(LOCALHOST_PATH + "/sdk-test");
+        const data = await response.json();
+        userId = data.userId;
+        apiKey = data.apiKey;
     })
 
     afterAll(async () => {
-        await getAxios().post(LOCALHOST_PATH + "/sdk-test", {
-            user_id: userId
-        })
+        await fetch(LOCALHOST_PATH + "/sdk-test", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId })
+        });
     })
 
 
@@ -399,7 +401,14 @@ describe("MinChat Instance", () => {
                                 resolve2(null)
                             }, 2000)
                         })
-                        chat1.setSeen(sentMessageId)
+                        await fetch(LOCALHOST_PATH + `/v1/messages/${sentMessageId}/seen`, {
+                            method: 'POST',
+                            headers: {
+                                "Authorization": "Bearer " + apiKey,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ user_id: instance1.getConnectedUser()?.id })
+                        })
                     })
                 })
             }
@@ -755,12 +764,13 @@ describe("MinChat Instance", () => {
                                 resolve2(null)
                             }, 2000)
                         })
-                        await getAxios().post(LOCALHOST_PATH + `/v1/messages/${sentMessageId}/seen`, {
-                            user_id: instance1.getConnectedUser()?.id
-                        }, {
+                        await fetch(LOCALHOST_PATH + `/v1/messages/${sentMessageId}/seen`, {
+                            method: 'POST',
                             headers: {
                                 "Authorization": "Bearer " + apiKey,
-                            }
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ user_id: instance1.getConnectedUser()?.id })
                         })
                     })
                 })
@@ -804,16 +814,18 @@ describe("MinChat Instance", () => {
                     expect(chat.getLastMessage()?.createdAt instanceof Date).toEqual(true)
                     checkDone()
                 })
-                const data = new FormData()
-                data.append("chat_id", chat1?.getId() as string)
-                data.append("user_id", instance2.getConnectedUser()?.id as string)
-                data.append("text", "Hello")
-                await getAxios().post(LOCALHOST_PATH + "/v1/messages", data, {
+                const formData = new FormData();
+                formData.append("chat_id", chat1?.getId() as string);
+                formData.append("user_id", instance2.getConnectedUser()?.id as string);
+                formData.append("text", "Hello");
+                await fetch(LOCALHOST_PATH + "/v1/messages", {
+                    method: 'POST',
                     headers: {
                         "Authorization": "Bearer " + apiKey,
                         'Content-Type': 'multipart/form-data',
-                    }
-                })
+                    },
+                    body: formData
+                });
             }
             runTest()
         })
@@ -853,14 +865,16 @@ describe("MinChat Instance", () => {
                     checkDone()
                 })
                 chat2?.sendMessage({ text: "Hello" }, async (message) => {
-                    const data = new FormData()
-                    data.append("text", "Updated")
-                    await getAxios().patch(LOCALHOST_PATH + `/v1/messages/${message.id}`, data, {
+                    const updateFormData = new FormData();
+                    updateFormData.append("text", "Updated");
+                    await fetch(LOCALHOST_PATH + `/v1/messages/${message.id}`, {
+                        method: 'PATCH',
                         headers: {
                             "Authorization": "Bearer " + apiKey,
                             'Content-Type': 'multipart/form-data',
-                        }
-                    })
+                        },
+                        body: updateFormData
+                    });
                     chat2.updateMessage(message?.id || "", { text: "Updated 2" })
                 })
             }
@@ -907,7 +921,8 @@ describe("MinChat Instance", () => {
                         resolve2(null)
                     }, 3000)
                 })
-                await getAxios().delete(LOCALHOST_PATH + `/v1/messages/${message1Id}`, {
+                await fetch(LOCALHOST_PATH + `/v1/messages/${message1Id}`, {
+                    method: 'DELETE',
                     headers: {
                         "Authorization": "Bearer " + apiKey
                     }

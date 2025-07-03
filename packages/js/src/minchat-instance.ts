@@ -8,11 +8,7 @@ import type { UpdateUserProps } from "./types/update-user-props";
 import type { User } from "./types/user"
 import type { UserProps } from "./types/user-props";
 import { prepareFileForUpload } from "./utils/file-utils";
-import getAxios from "./utils/get-axios";
 import { io, type ManagerOptions, type SocketOptions } from "socket.io-client"
-
-const axios = getAxios()
-
 
 export class MinChatInstance {
     config: Config
@@ -32,22 +28,17 @@ export class MinChatInstance {
 
         if (this.config.user || this.config.demo) {
             try {
-
-                const params = {
+                const params = new URLSearchParams({
                     user_id: this.config.user?.id || "demo",
-                    page
-                }
-
-                const response = await axios.get((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/chat/list', {
+                    ...(page !== undefined ? { page: String(page) } : {})
+                });
+                const response = await fetch((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/chat/list?' + params.toString(), {
                     headers: {
                         'Authorization': "Bearer " + this.config.apiKey,
-                    },
-                    params
-                })
-
-                //return the data in the function if using async await
-                return transformChatsResponse(response.data, this.config)
-
+                    }
+                });
+                const data = await response.json();
+                return transformChatsResponse(data, this.config);
             } catch (e) {
                 console.log(e)
             }
@@ -96,16 +87,14 @@ export class MinChatInstance {
 
 
     async fetchUser(username: string): Promise<User> {
-        const response = await axios.get((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/user', {
+        const params = new URLSearchParams({ username });
+        const response = await fetch((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/user?' + params.toString(), {
             headers: {
                 'Authorization': "Bearer " + this.config.apiKey
-            },
-            params: {
-                username
             }
-        })
-
-        return transformUser(response.data.user)
+        });
+        const data = await response.json();
+        return transformUser(data.user);
     }
 
     async deleteUser(username: string): Promise<Boolean> {
@@ -114,31 +103,28 @@ export class MinChatInstance {
     }
 
     async deleteUserById(id: string): Promise<Boolean> {
-        const response = await axios.delete((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/user/' + id, {
+        const response = await fetch((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/user/' + id, {
+            method: 'DELETE',
             headers: {
                 'Authorization': "Bearer " + this.config.apiKey
-            },
-        })
-
-        if (response) {
-            return true
+            }
+        });
+        if (response.ok) {
+            return true;
         } else {
-            return false
+            return false;
         }
-
     }
 
     async fetchUserById(id: string): Promise<User> {
-        const response = await axios.get((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/user', {
+        const params = new URLSearchParams({ id });
+        const response = await fetch((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/user?' + params.toString(), {
             headers: {
                 'Authorization': "Bearer " + this.config.apiKey
-            },
-            params: {
-                id
             }
-        })
-
-        return transformUser(response.data.user)
+        });
+        const data = await response.json();
+        return transformUser(data.user);
     }
 
 
@@ -161,17 +147,15 @@ export class MinChatInstance {
             }
         }
 
-
-
-        const response = await axios.patch((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/user/' + userId,
-            data,
-            {
-                headers: {
-                    'Authorization': "Bearer " + this.config.apiKey
-                },
-            })
-
-        return transformUser(response.data.user)
+        const response = await fetch((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/user/' + userId, {
+            method: 'PATCH',
+            headers: {
+                'Authorization': "Bearer " + this.config.apiKey
+            },
+            body: data
+        });
+        const resData = await response.json();
+        return transformUser(resData.user);
     }
 
 
@@ -194,35 +178,32 @@ export class MinChatInstance {
             }
         }
 
-        const response = await axios.post((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/user', data, {
-            headers: {
-                'Authorization': "Bearer " + this.config.apiKey,
-                'Content-Type': 'multipart/form-data',
-            },
-        })
-
-        return transformUser(response.data.user)
-    }
-
-    async getUsers(usernames: string[]): Promise<User[]> {
-
-        const response = await axios.get((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/user/list', {
+        const response = await fetch((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/user', {
+            method: 'POST',
             headers: {
                 'Authorization': "Bearer " + this.config.apiKey
             },
-            params: {
-                usernames
+            body: data
+        });
+        const resData = await response.json();
+        return transformUser(resData.user);
+    }
+
+    async getUsers(usernames: string[]): Promise<User[]> {
+        const params = new URLSearchParams();
+        usernames.forEach(u => params.append('usernames[]', u));
+        const response = await fetch((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/user/list?' + params.toString(), {
+            headers: {
+                'Authorization': "Bearer " + this.config.apiKey
             }
-        })
+        });
+        const data = await response.json();
 
-
-        const users: User[] = []
-
-        response.data.users.forEach((user: any) => {
-            users.push(transformUser(user))
-        })
-
-        return users
+        const users: User[] = [];
+        data.users.forEach((user: any) => {
+            users.push(transformUser(user));
+        });
+        return users;
     }
 
 
@@ -262,26 +243,26 @@ export class MinChatInstance {
             const members = await this.getUsers([withUsername])
 
             try {
-                const response = await axios.post((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/chat', {
-                    usernames: [this.config.user.username, withUsername],
-                    user_id: this.config.user.id,
-                    metadata: options?.metadata
-                }, {
+                const response = await fetch((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/chat', {
+                    method: 'POST',
                     headers: {
-                        'Authorization': "Bearer " + this.config.apiKey
+                        'Authorization': "Bearer " + this.config.apiKey,
+                        'Content-Type': 'application/json',
                     },
-                })
-
-                chat.config.members = members
-                chat.config.memberIds = response.data.participant_user_ids?.filter((id: string) => id !== this.config.user?.id)
-                chat.config.channelId = response.data.id
-                chat.config.metadata = response.data.metadata
-                chat.config.avatar = members[0]?.avatar
-                chat.config.title = members[0]?.name && members[0]?.name.trim().length > 0 ? members[0].name : "No Name"
-
-
-                chat._init()
-
+                    body: JSON.stringify({
+                        usernames: [this.config.user.username, withUsername],
+                        user_id: this.config.user.id,
+                        metadata: options?.metadata
+                    })
+                });
+                const resData = await response.json();
+                chat.config.members = members;
+                chat.config.memberIds = resData.participant_user_ids?.filter((id: string) => id !== this.config.user?.id);
+                chat.config.channelId = resData.id;
+                chat.config.metadata = resData.metadata;
+                chat.config.avatar = members[0]?.avatar;
+                chat.config.title = members[0]?.name && members[0]?.name.trim().length > 0 ? members[0].name : "No Name";
+                chat._init();
             } catch (e) {
                 console.log(e)
                 return undefined
@@ -322,23 +303,22 @@ export class MinChatInstance {
                 }
             }
 
-            const response = await axios.post((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/chat', data, {
+            const response = await fetch((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/chat', {
+                method: 'POST',
                 headers: {
                     'Authorization': "Bearer " + this.config.apiKey,
-                    "Content-Type": "multipart/form-data",
-                    "Accept": "application/json"
+                    'Accept': 'application/json'
                 },
-            })
-
-
-            chat.config.members = await this.getUsers(memberUsernames)
-            chat.config.memberIds = response.data.participant_user_ids?.filter((id: string) => id !== this.config.user?.id)
-            chat.config.channelId = response.data.id
-            chat.config.metadata = response.data.metadata
-            chat.config.avatar = response.data.avatar
-            chat.config.title = response.data.title && response.data.title.trim().length > 0 ? response.data.title.trim() : "Group Chat"
-
-            chat._init()
+                body: data
+            });
+            const resData = await response.json();
+            chat.config.members = await this.getUsers(memberUsernames);
+            chat.config.memberIds = resData.participant_user_ids?.filter((id: string) => id !== this.config.user?.id);
+            chat.config.channelId = resData.id;
+            chat.config.metadata = resData.metadata;
+            chat.config.avatar = resData.avatar;
+            chat.config.title = resData.title && resData.title.trim().length > 0 ? resData.title.trim() : "Group Chat";
+            chat._init();
 
             return chat
         } else {
@@ -348,14 +328,17 @@ export class MinChatInstance {
 
     async deleteChat(chatId: string): Promise<boolean> {
         try {
-            const response = await axios.delete((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/chat/' + chatId, {
+            const response = await fetch((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/chat/' + chatId, {
+                method: 'DELETE',
                 headers: {
                     'Authorization': "Bearer " + this.config.apiKey
-                },
+                }
             });
-
-            return response.data.success
+            const data = await response.json();
+            console.log({ data })
+            return data.success;
         } catch (e) {
+            console.log({ e })
             return false
         }
     }
