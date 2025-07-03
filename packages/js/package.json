@@ -21,6 +21,7 @@
   "devDependencies": {
     "@types/socket.io": "^3.0.1",
     "cuid": "^3.0.0",
+    "rollup-plugin-visualizer": "^6.0.3",
     "typescript": "~5.8.3",
     "vite": "^6.3.5",
     "vite-plugin-dts": "^4.5.4",

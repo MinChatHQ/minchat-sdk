@@ -2,12 +2,15 @@ import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 import react from '@vitejs/plugin-react'
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
+import { visualizer } from 'rollup-plugin-visualizer';
 
 export default defineConfig({
   plugins: [
     react(),
     dts({ tsconfigPath: './tsconfig.app.json' }),
-    cssInjectedByJsPlugin()
+    cssInjectedByJsPlugin(),
+    dts({ tsconfigPath: './tsconfig.app.json' })
+
   ],
   build: {
     lib: {
