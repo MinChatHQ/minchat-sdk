@@ -161,6 +161,10 @@ function App() {
                     const user = await minchat.createUser(user2);
                     return user.username;
                   }}
+                  renderMessageThemeColor={(message) => {
+                    console.log({ message })
+                    return 'red'
+                  }}
                   height='100%'
                   test={true}
                   user={user1}

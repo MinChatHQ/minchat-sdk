@@ -115,6 +115,7 @@ export default function Inbox({
       showBack={isMobile}
       onBack={clearMessageList}> {heading}</MessageHeader>
   },
+  renderMessageThemeColor,
   renderIsTyping = () => undefined,
   renderMessageList = ({ loading, messages, paginate, connectedUser, typingUser, isMobile }) => <MessageList
     mobileView={isMobile}
@@ -124,6 +125,7 @@ export default function Inbox({
     currentUserId={connectedUser.id}
     customEmptyMessagesComponent={(() => renderEmptyMessages({ isMobile }))()}
     customLoaderComponent={(() => renderLoader({ isMobile }))()}
+    getMessageThemeColor={(message) => renderMessageThemeColor && renderMessageThemeColor(message as any)}
     messages={messages && messages.map((ogMessage) => {
       const { createdAt, ...message } = ogMessage
       if (message.file) {

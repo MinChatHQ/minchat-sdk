@@ -82,16 +82,17 @@ type RenderChatListHeaderProps = {
  * 
  */
 export interface RenderProps {
-  renderEmptyChats?: (props: RenderEmtpyChatsProps) => React.ReactNode | null
-  renderEmptyMessages?: (props: RenderEmptyMessagesProps) => React.ReactNode | null
-  renderChatItem?: (props: RenderChatItemProps) => React.ReactNode | null
-  renderChatList?: (props: RenderChatListProps) => React.ReactNode | null
-  renderLoader?: (props: RenderLoaderProps) => React.ReactNode | null
-  renderMessageList?: (props: RenderMessageListProps) => React.ReactNode | null
-  renderInput?: (props: RenderInputProps) => React.ReactNode | null
+  renderEmptyChats?: (props: RenderEmtpyChatsProps) => React.ReactNode | null| undefined
+  renderEmptyMessages?: (props: RenderEmptyMessagesProps) => React.ReactNode | null| undefined
+  renderChatItem?: (props: RenderChatItemProps) => React.ReactNode | null| undefined
+  renderChatList?: (props: RenderChatListProps) => React.ReactNode | null| undefined
+  renderLoader?: (props: RenderLoaderProps) => React.ReactNode | null| undefined
+  renderMessageList?: (props: RenderMessageListProps) => React.ReactNode | null| undefined
+  renderInput?: (props: RenderInputProps) => React.ReactNode | null| undefined
   // renderChatListHeader?: (props: RenderChatListHeaderProps) => React.ReactNode | null
-  renderMessageListHeader?: (props: RenderMessageListHeaderProps) => React.ReactNode | null
-  renderIsTyping?: (props: RenderIsTypingProps) => React.ReactNode | null
+  renderMessageListHeader?: (props: RenderMessageListHeaderProps) => React.ReactNode | null| undefined
+  renderIsTyping?: (props: RenderIsTypingProps) => React.ReactNode | null | undefined
+  renderMessageThemeColor?: (props: FullMessage) => string  | undefined
 }
 
 /**

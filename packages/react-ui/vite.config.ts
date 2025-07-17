@@ -10,7 +10,7 @@ export default defineConfig({
     dts({ tsconfigPath: './tsconfig.app.json' }),
     cssInjectedByJsPlugin(),
     dts({ tsconfigPath: './tsconfig.app.json' }),
-    visualizer({ open: true })
+    visualizer({ open: false })
   ],
   build: {
     minify: true,
