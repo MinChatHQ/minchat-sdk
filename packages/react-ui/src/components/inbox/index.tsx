@@ -57,11 +57,13 @@ export default function Inbox({
   demo,
   openChatId,
   onAiAction,
+  hideChatItem,
   // render props
   renderEmptyMessages = () => undefined,
   renderEmptyChats = () => undefined,
   renderLoader = () => undefined,
   renderChatItem = () => undefined,
+
   renderChatList = ({ connectedUser, chats, loading, selectedChat, paginate, openChat, isMobile }) => <ConversationList
     mobileView={isMobile}
     currentUserId={connectedUser.id}
@@ -260,13 +262,11 @@ export default function Inbox({
 
         const memberIds = selectedChat.getMemberIds()
 
-        console.log({ memberIds, })
         if (memberIds.length === 1 && minchat) {
 
           function getStatus() {
             const members = selectedChat?.getMembers()
             const member = members?.find(member => memberIds[0] === member.id)
-            console.log({ member })
             if (member) {
               setLastOnline(member.lastActive)
             }
@@ -318,7 +318,7 @@ export default function Inbox({
  */
   const ChatListComponent = () => currentUser && renderChatList({
     connectedUser: currentUser,
-    chats,
+    chats: chats && (hideChatItem ? chats.filter(chat => !hideChatItem(chat)) : chats),
     loading: chatsLoading,
     paginate: throttledChatsPaginate,
     openChat: (chat) => setSelectedChat(chat),

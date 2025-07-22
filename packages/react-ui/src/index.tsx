@@ -82,17 +82,21 @@ type RenderChatListHeaderProps = {
  * 
  */
 export interface RenderProps {
-  renderEmptyChats?: (props: RenderEmtpyChatsProps) => React.ReactNode | null| undefined
-  renderEmptyMessages?: (props: RenderEmptyMessagesProps) => React.ReactNode | null| undefined
-  renderChatItem?: (props: RenderChatItemProps) => React.ReactNode | null| undefined
-  renderChatList?: (props: RenderChatListProps) => React.ReactNode | null| undefined
-  renderLoader?: (props: RenderLoaderProps) => React.ReactNode | null| undefined
-  renderMessageList?: (props: RenderMessageListProps) => React.ReactNode | null| undefined
-  renderInput?: (props: RenderInputProps) => React.ReactNode | null| undefined
+  renderEmptyChats?: (props: RenderEmtpyChatsProps) => React.ReactNode | null | undefined
+  renderEmptyMessages?: (props: RenderEmptyMessagesProps) => React.ReactNode | null | undefined
+  renderChatItem?: (props: RenderChatItemProps) => React.ReactNode | null | undefined
+  renderChatList?: (props: RenderChatListProps) => React.ReactNode | null | undefined
+  renderLoader?: (props: RenderLoaderProps) => React.ReactNode | null | undefined
+  renderMessageList?: (props: RenderMessageListProps) => React.ReactNode | null | undefined
+  renderInput?: (props: RenderInputProps) => React.ReactNode | null | undefined
   // renderChatListHeader?: (props: RenderChatListHeaderProps) => React.ReactNode | null
-  renderMessageListHeader?: (props: RenderMessageListHeaderProps) => React.ReactNode | null| undefined
+  renderMessageListHeader?: (props: RenderMessageListHeaderProps) => React.ReactNode | null | undefined
   renderIsTyping?: (props: RenderIsTypingProps) => React.ReactNode | null | undefined
-  renderMessageThemeColor?: (props: FullMessage) => string  | undefined
+  renderMessageThemeColor?: (props: FullMessage) => string | undefined
+  /**
+   * Function to determine if a chat item should be hidden. If it returns true, the chat will be hidden.
+   */
+  hideChatItem?: (chat: Chat) => boolean
 }
 
 /**
@@ -120,6 +124,10 @@ export interface Props extends RenderProps {
     event: string,
     chatbotUsername: string
   }) => void
+  /**
+   * Function to determine if a chat item should be hidden. If it returns true, the chat will be hidden.
+   */
+  hideChatItem?: (chat: Chat) => boolean
 }
 
 export {
@@ -158,6 +166,7 @@ export function MinChatUI(props: Props) {
         <Inbox
           demo={demo}
           {...restProps}
+          hideChatItem={props.hideChatItem}
         />
       </UiContext.Provider>
     </MinChatUiProvider >
