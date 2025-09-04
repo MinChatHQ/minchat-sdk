@@ -110,8 +110,9 @@ export default function Inbox({
     })}
     onScrollToBottom={() => paginate()}
   />,
-  renderMessageListHeader = ({ heading, clearMessageList, isMobile, lastActive }) => {
+  renderMessageListHeader = ({ heading, clearMessageList, isMobile, lastActive, avatar }) => {
     return <MessageHeader
+      avatar={avatar}
       lastActive={demo ? new Date() : lastActive}
       mobileView={isMobile}
       showBack={isMobile}
@@ -333,7 +334,8 @@ export default function Inbox({
     heading: (selectedChat && selectedChat.getTitle()) || "",
     clearMessageList: () => setSelectedChat(undefined),
     isMobile: determineIsMobile(),
-    lastActive: lastOnline
+    lastActive: lastOnline,
+    avatar: selectedChat?.getChatAvatar()
   })
 
   /**

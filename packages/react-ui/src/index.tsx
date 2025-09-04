@@ -24,6 +24,7 @@ type RenderMessageListHeaderProps = {
   isMobile: boolean
   heading: string
   lastActive: Date | undefined
+  avatar: string | undefined
   /**
    * get rid of all the messages currently shown for the selected chat
    */
