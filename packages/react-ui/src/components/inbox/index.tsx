@@ -1,6 +1,5 @@
 import { useMinChat, useChats, useMessages, useUser, type User, type Chat, MinChatInstanceReact } from '@minchat/react';
 import React, { useContext, useEffect, useRef, useState } from 'react'
-import styled from 'styled-components';
 import UiContext from '../../UiContext';
 import {
   MainContainer,
@@ -37,14 +36,7 @@ interface Props extends RenderProps {
   }) => void
 }
 
-interface ContainerProps {
-  height: string
-}
-
-const Container = styled.div<ContainerProps>`
-  position: relative;
-  height: ${({ height }) => height == "full" ? "100vh" : height};
-`
+ 
 
 export default function Inbox({
   startConversation,
@@ -371,9 +363,9 @@ export default function Inbox({
   }
 
   return (
-    <Container
+    <div
       ref={containerRef}
-      height={containerHeight}>
+      style={{ position: 'relative', height: containerHeight == "full" ? "100vh" : containerHeight }}>
       {/* for handling picking files */}
       <input
         type="file"
@@ -422,6 +414,6 @@ export default function Inbox({
         }
       </MainContainer>
 
-    </Container>
+    </div>
   )
 }

@@ -82,9 +82,12 @@ function App() {
         <Route path="/user-1" element={
           <div ref={ref} id='testing-styles'>
             {target &&
-              <>
+              <div
+                style={{ height: '42rem' }}
+              >
                 <button onClick={() => setSelectedUser(user2)}>Change to user 2</button>
                 <MinChatUI
+                height='100%'
                   theme='red'
                   test={true}
                   user={selectedUser}
@@ -95,7 +98,7 @@ function App() {
                   groupChatTitle="Dize"
                   apiKey={apiKey}
                 />
-              </>}
+              </div>}
           </div>
         } />
         <Route path="/user-2" element={

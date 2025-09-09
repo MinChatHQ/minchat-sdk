@@ -27,7 +27,9 @@ export default defineConfig({
         'react-dom',
         'react/jsx-runtime',
         'react/jsx-dev-runtime',
-        '@minchat/react-chat-ui'],
+        '@minchat/react-chat-ui',
+        'styled-components'
+      ],
       output: {
         globals: {
           react: 'React',
