@@ -164,11 +164,12 @@ export function MinChatUI(props: Props) {
       colorSet={colorSet}
       theme={theme}>
       <UiContext.Provider value={{ height }}>
-        <Inbox
-          demo={demo}
-          {...restProps}
-          hideChatItem={props.hideChatItem}
-        />
+          <Inbox
+            demo={demo}
+            {...restProps}
+            hideChatItem={props.hideChatItem}
+          />
+
       </UiContext.Provider>
     </MinChatUiProvider >
   </MinChatProvider>

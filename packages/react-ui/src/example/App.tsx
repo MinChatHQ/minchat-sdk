@@ -2,7 +2,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
 // import { io } from 'socket.io-client';
 import { MinChatUI } from '..';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const devKey = "CMBPFNMXW0000WEV26EYE6TUT";
 const prodKey = "";
@@ -62,23 +62,40 @@ function App() {
   //   });
   // }, []);
 
+  const ref = useRef<any>(undefined)
+  let [target, setTarget] = useState<any>()
+
+  useEffect(() => {
+    const t = document.getElementById('testing-styles')
+    if (t) {
+      setTarget(t)
+    }
+    console.log({ t })
+
+
+  }, [ref.current])
+
+
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/user-1" element={
-          <div>
-            <button onClick={() => setSelectedUser(user2)}>Change to user 2</button>
-            <MinChatUI
-              theme='red'
-              test={true}
-              user={selectedUser}
-              startConversation={async (minchat) => {
-                const user = await minchat.createUser(user2);
-                return [user.id];
-              }}
-              groupChatTitle="Dize"
-              apiKey={apiKey}
-            />
+          <div ref={ref} id='testing-styles'>
+            {target &&
+              <>
+                <button onClick={() => setSelectedUser(user2)}>Change to user 2</button>
+                <MinChatUI
+                  theme='red'
+                  test={true}
+                  user={selectedUser}
+                  startConversation={async (minchat) => {
+                    const user = await minchat.createUser(user2);
+                    return [user.id];
+                  }}
+                  groupChatTitle="Dize"
+                  apiKey={apiKey}
+                />
+              </>}
           </div>
         } />
         <Route path="/user-2" element={
