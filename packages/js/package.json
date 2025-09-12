@@ -1,6 +1,6 @@
 {
   "name": "@minchat/js",
-  "version": "4.1.4",
+  "version": "4.2.0",
   "author": "MinChat",
   "description": "Minchat SDK for JS",
   "main": "dist/minchat-sdk.umd.js",

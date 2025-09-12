@@ -1,6 +1,6 @@
 {
   "name": "@minchat/react",
-  "version": "4.1.7",
+  "version": "4.3.1",
   "author": "MinChat",
   "description": "Minchat SDK for React",
   "main": "dist/minchat-sdk.umd.js",
@@ -18,11 +18,10 @@
     "push-dev": "npm run build && npm publish --tag dev",
     "push": "npm run build && npm publish"
   },
-  "dependencies": {},
   "peerDependencies": {
+    "@minchat/js": "^4.2.0",
     "react": ">=18.0.0",
-    "react-dom": ">=18.0.0",
-    "@minchat/js": ">=4.1.4"
+    "react-dom": ">=18.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",

@@ -2,7 +2,7 @@ import MinChatJs, { type SingleChatProps } from "@minchat/js"
 
 import Chat from "./chat";
 import type { ManagerOptions, SocketOptions } from "socket.io-client";
-import type { UserProps, GroupChatProps, User } from "@minchat/js";
+import type { UserProps, GroupChatProps, User, ChatsResponse } from "@minchat/js";
 import type { MinChatInstance } from "@minchat/js/dist/minchat-instance";
 import type { UpdateUserProps } from "@minchat/js/dist/types/update-user-props";
 
@@ -55,6 +55,16 @@ class MinChatInstanceReact {
     async updateUserById(userId: string, user: UpdateUserProps): Promise<User> {
         return await this.instance.updateUserById(userId, user)
 
+    }
+
+    async getChatById(chatId: string): Promise<Chat | undefined> {
+        const chat = await this.instance.getChatById(chatId)
+        return chat ? new Chat(chat) : undefined
+    }
+
+    async getChats(page?: number, limit?: number): Promise<Chat[]> {
+        const chats = await this.instance.getChats(page, limit)
+        return chats.chats.map(chat => new Chat(chat))
     }
 
 

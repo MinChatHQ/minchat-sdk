@@ -98,6 +98,17 @@ export interface RenderProps {
    * Function to determine if a chat item should be hidden. If it returns true, the chat will be hidden.
    */
   hideChatItem?: (chat: Chat) => boolean
+
+  /**
+   * Whether to scroll to the bottom of the message list when a new message is received.
+   */
+  forceScrollToBottomOnNewMessage?: boolean
+
+  /**
+   * Whether to show the incoming message header.
+   */
+  showIncomingMessageHeader?: boolean
+
 }
 
 /**
@@ -107,9 +118,10 @@ export interface Props extends RenderProps {
   apiKey: string,
   user: UserProps,
   height?: string | "full"
-  // start a conversation with one or more users
-  startConversation?: (minchat: MinChatInstanceReact) => Promise<string | Array<string>> | string | Array<string>
-  startConversationMetadata?: Record<string, string | number | boolean>
+   // start a conversation with one or more users
+   startConversation?: (minchat: MinChatInstanceReact) => Promise<string | undefined | null | Array<string>> | string | Array<string>
+   //determines whether to open a specific conversation id
+   openConversation?: (minchat: MinChatInstanceReact) => Promise<string | undefined | null>
   groupChatTitle?: string
   demo?: boolean
   test?: boolean
@@ -164,11 +176,11 @@ export function MinChatUI(props: Props) {
       colorSet={colorSet}
       theme={theme}>
       <UiContext.Provider value={{ height }}>
-          <Inbox
-            demo={demo}
-            {...restProps}
-            hideChatItem={props.hideChatItem}
-          />
+        <Inbox
+          demo={demo}
+          {...restProps}
+          hideChatItem={props.hideChatItem}
+        />
 
       </UiContext.Provider>
     </MinChatUiProvider >

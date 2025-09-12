@@ -87,13 +87,21 @@ function App() {
               >
                 <button onClick={() => setSelectedUser(user2)}>Change to user 2</button>
                 <MinChatUI
-                height='100%'
+                  height='100%'
                   theme='red'
                   test={true}
                   user={selectedUser}
                   startConversation={async (minchat) => {
                     const user = await minchat.createUser(user2);
                     return [user.id];
+                  }}
+
+                  openConversation={async (minchat) => {
+                    const chats = await minchat.getChats(1,1)
+
+                    console.log({ openChats: chats })
+
+                    return chats[0].getId()
                   }}
                   groupChatTitle="Dize"
                   apiKey={apiKey}
@@ -145,6 +153,7 @@ function App() {
         <Route path="/user-1-2" element={
           <div className='container'>
             <MinChatUI
+              showIncomingMessageHeader={false}
               test={true}
               // openChatId='clqdhzd6f000ltcdofbp5vedo'
               // groupChatTitle='Groupies'
@@ -155,11 +164,14 @@ function App() {
               }}
               user={user1}
               apiKey={apiKey}
+
               renderIsTyping={({ user }) => <div>{user.name} is typing</div>}
               renderEmptyMessages={() => <div>No Messages Here</div>}
+              forceScrollToBottomOnNewMessage={true}
             />
             <MinChatUI
               test={true}
+              showIncomingMessageHeader={false}
               startConversation={async (minchat) => {
                 const u1 = await minchat.createUser(user1);
                 // const u3 = await minchat.createUser(user3);
@@ -168,6 +180,7 @@ function App() {
               user={user2}
               apiKey={apiKey}
               mobileView={false}
+              forceScrollToBottomOnNewMessage={true}
             />
           </div>
         } />

@@ -20,7 +20,9 @@ import { Status } from '@minchat/js';
 
 interface Props extends RenderProps {
   // start a conversation with one or more users
-  startConversation?: (minchat: MinChatInstanceReact) => Promise<string | Array<string>> | string | Array<string>
+  startConversation?: (minchat: MinChatInstanceReact) => Promise<string | undefined | null | Array<string>> | string | Array<string>
+  //determines whether to open a specific conversation id
+  openConversation?: (minchat: MinChatInstanceReact) => Promise<string | undefined | null>
   startConversationMetadata?: Record<string, string | number | boolean>
   groupChatTitle?: string
   mobileView?: boolean
@@ -36,11 +38,12 @@ interface Props extends RenderProps {
   }) => void
 }
 
- 
+
 
 export default function Inbox({
   startConversation,
   startConversationMetadata,
+  openConversation,
   groupChatTitle,
   mobileView,
   showAttachButton = true,
@@ -111,8 +114,13 @@ export default function Inbox({
       onBack={clearMessageList}> {heading}</MessageHeader>
   },
   renderMessageThemeColor,
+  forceScrollToBottomOnNewMessage,
+  showIncomingMessageHeader,
   renderIsTyping = () => undefined,
   renderMessageList = ({ loading, messages, paginate, connectedUser, typingUser, isMobile }) => <MessageList
+    enableMarkdown
+    showIncomingMessageHeader={showIncomingMessageHeader}
+    forceScrollToBottomOnNewMessage={forceScrollToBottomOnNewMessage}
     mobileView={isMobile}
     typingIndicatorContent={typingUser ? `${typingUser.name} is typing` : ""}
     customTypingIndicatorComponent={(() => typingUser ? renderIsTyping({ user: typingUser, isMobile }) : undefined)()}
@@ -177,12 +185,16 @@ export default function Inbox({
   })
 
   const { height: containerHeight } = useContext(UiContext)
+
+
   useEffect(() => {
     const setupStartConversation = async () => {
       if (startConversation && minchat) {
         let chat: Chat | null
 
         let usernames = await startConversation(minchat)
+
+        if (!usernames) return
 
         if (!Array.isArray(usernames)) {
           usernames = [usernames]
@@ -208,6 +220,32 @@ export default function Inbox({
     setupStartConversation()
 
   }, [startConversation, minchat])
+
+
+  //setup open conversation
+  useEffect(() => {
+    if (openConversation && minchat) {
+      const setupOpenConversation = async () => {
+        const chatId = await openConversation(minchat)
+        if (chatId) {
+          const chat = chats?.find(chat => chat.getId() === chatId)
+          if (chat) {
+            setSelectedChat(chat)
+          } else {
+            //search the backend server for a chat with that chatid
+            const chat = await minchat.getChatById(chatId)
+            if (chat) {
+              setSelectedChat(chat)
+            }
+          }
+        }
+      }
+      setupOpenConversation()
+    }
+  }, [openConversation, minchat])
+
+
+
 
   useEffect(() => {
     if (chats) {
@@ -307,8 +345,8 @@ export default function Inbox({
   }
 
   /**
- * 
- */
+  * 
+  */
   const ChatListComponent = () => currentUser && renderChatList({
     connectedUser: currentUser,
     chats: chats && (hideChatItem ? chats.filter(chat => !hideChatItem(chat)) : chats),
@@ -320,8 +358,8 @@ export default function Inbox({
   })
 
   /**
- * 
- */
+  * 
+  */
   const MessageListHeaderComponent = () => renderMessageListHeader({
     heading: (selectedChat && selectedChat.getTitle()) || "",
     clearMessageList: () => setSelectedChat(undefined),
@@ -331,8 +369,8 @@ export default function Inbox({
   })
 
   /**
- * 
- */
+  * 
+  */
   const MessageListComponent = () => currentUser && renderMessageList({
     paginate: throttledMessagesPaginate,
     messages,
@@ -344,8 +382,8 @@ export default function Inbox({
 
 
   /**
- * 
- */
+  * 
+  */
   const InputComponent = () => renderInput({
     sendMessage: (text) => handleSendMessage({ text }),
     sendFile: () => openFileSelector(),
@@ -365,7 +403,7 @@ export default function Inbox({
   return (
     <div
       ref={containerRef}
-      style={{ position: 'relative', height: containerHeight == "full" ? "100vh" : containerHeight }}>
+      style={{ position: 'relative', height: containerHeight == "full" ? "100dvh" : containerHeight }}>
       {/* for handling picking files */}
       <input
         type="file"

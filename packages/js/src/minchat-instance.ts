@@ -19,18 +19,33 @@ export class MinChatInstance {
 
     }
 
+    async getChatById(chatId: string): Promise<Chat | undefined> {
+        await this.config.waitForInstanceReady()
+        if (this.config.user || this.config.demo) {
+            const response = await fetch((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/chat/' + chatId, {
+                headers: {
+                    'Authorization': "Bearer " + this.config.apiKey
+                }
+            });
+            const data = await response.json();
+            return transformChat(data, this.config);
+        } else {
+            return undefined
+        }
+    }
 
     /**
    * 
    */
-    async getChats(page?: number): Promise<ChatsResponse> {
+    async getChats(page?: number, limit?: number): Promise<ChatsResponse> {
         await this.config.waitForInstanceReady()
 
         if (this.config.user || this.config.demo) {
             try {
                 const params = new URLSearchParams({
                     user_id: this.config.user?.id || "demo",
-                    ...(page !== undefined ? { page: String(page) } : {})
+                    ...(page !== undefined ? { page: String(page) } : {}),
+                    ...(limit !== undefined ? { limit: String(limit) } : {})
                 });
                 const response = await fetch((this.config.test ? this.config.localhostPath : this.config.productionPath) + '/v1/chat/list?' + params.toString(), {
                     headers: {
